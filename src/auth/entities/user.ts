@@ -1,0 +1,47 @@
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+
+export enum UserRole {
+    ADMIN = "admin",
+    CUSTOMER = "customer",
+    MERCHANT = "merchant",
+    DELIVERY = "delivery"
+}
+
+@Entity({name:"users"})
+export class User {
+    @PrimaryGeneratedColumn("uuid", { name: "id" })
+    id: string;
+
+    @Column({ name: "email", unique: true })
+    email: string;
+
+    @Column({ name: "password" })
+    password: string;
+
+    @Column({ name: "first_name" })
+    firstName: string;
+
+    @Column({ name: "last_name" })
+    lastName: string;
+
+    @Column({ name: "is_active", default: true })
+    isActive: boolean;
+
+    @Column({ name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    createdAt: Date;
+
+    @Column({name: "role", type: "enum", enum: UserRole})
+    role: UserRole; 
+
+    @Column({ name: "phone_number", nullable: true })
+    phoneNumber: string | null;
+
+    @Column({ name: "address", nullable: true })
+    address: string | null;
+
+    @Column({ name: "profile_picture", nullable: true })
+    profilePicture: string | null;
+
+    @Column({name: "age" , type: "int", nullable: true })
+    age: number | null;
+}
