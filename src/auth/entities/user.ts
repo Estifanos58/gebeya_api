@@ -34,14 +34,14 @@ export class User {
     role: UserRole; 
 
     @Column({ name: "phone_number", nullable: true })
-    phoneNumber: string | null;
+    phoneNumber: string;
 
     @Column({ name: "address", nullable: true })
-    address: string | null;
+    address: string;
 
     @Column({ name: "profile_picture", nullable: true })
-    profilePicture: string | null;
+    profilePicture: string;
 
     @Column({name: "age" , type: "int", nullable: true })
-    age: number | null;
+    age: number;
 }

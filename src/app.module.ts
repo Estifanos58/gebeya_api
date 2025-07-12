@@ -11,10 +11,11 @@ import { User } from './auth/entities/user';
         type: "postgres",
         host: "localhost",
         port: 5432,
-        username: "postgres",
+        username: "estif",
         password: "mypassword",
-        database: "ecommerce",
-        entities: [User]
+        database: "gebeya",
+        entities: [User],
+        synchronize: true
       })
     ,AuthModule],
   controllers: [AppController],

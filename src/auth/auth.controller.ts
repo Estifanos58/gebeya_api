@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
 import { loginDto } from './dto/login-user.dto';
 import { Response } from 'express';
@@ -9,7 +9,7 @@ import { LoginUserCommand } from './commands/login-user.command';
 
 @Controller('auth')
 export class AuthController {
-    constructor( private readonly commandBus: CommandBus, private readonly queryBus: QueryBus){}
+    constructor( private readonly commandBus: CommandBus){}
     // Sign Up
 
     @Post('signup')
@@ -29,10 +29,10 @@ export class AuthController {
 
         generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
        
-        return {
+        return res.status(201).json({ 
             message: 'User created successfully',
             user
-        };
+        })
     }
 
     @Post('login')
@@ -46,12 +46,12 @@ export class AuthController {
         // Generate JWT token
         const token = generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
 
-        return {
+        return res.status(200).json({
             message: 'User logged in successfully',
             user: {
                 ...user.user,
                 token
             }
-        };
+        });
     }
 }

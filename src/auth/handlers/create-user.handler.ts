@@ -12,7 +12,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     async execute(command: CreateUserCommand): Promise<any> {
         // Destructure the  Props
-        const { email, password, firstName, lastName, role, phoneNumber, address, profilePicture, age } = command;
+        const { email, password, firstName, lastName, role } = command;
 
         try {
                // Find if the user already exists
@@ -30,17 +30,14 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             firstName,
             lastName,
             role,
-            phoneNumber: phoneNumber || null,
-            address: address || null,
-            profilePicture: profilePicture || null,
-            age: age || null
         })
-
-        const { password: _, ...userWithoutPassword } = user; // Exclude password from the response
+        
+        // Exclude password from the response
+        const {password:_,...userWithoutPassword} = user
 
         return {
             message: 'User created successfully',
-            user: userWithoutPassword
+            user: userWithoutPassword 
         }
         } catch (error) {
             throw new HttpException({message: "Error creating user",
