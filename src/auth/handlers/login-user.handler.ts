@@ -20,7 +20,7 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
 
         // Check if user exists
         if(!user){
-            throw new HttpException({ message: "Invalid Creadential" }, HttpStatus.NOT_FOUND);
+            throw new HttpException({ message: "Invalid Creadential" }, HttpStatus.UNAUTHORIZED);
         }
 
         // Compare the provided password with the stored hashed password
