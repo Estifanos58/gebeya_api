@@ -1,7 +1,7 @@
 import { Response } from "express";
+import * as jwt from 'jsonwebtoken';
 
 export const generateJWTTOken = (userId: string, email: string, role: string, res: Response) => {
-    const jwt = require('jsonwebtoken');
     const secretKey = process.env.JWT_SECRET || ""
 
     const token = jwt.sign(
