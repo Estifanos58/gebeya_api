@@ -4,7 +4,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
 import { loginDto } from './dto/login-user.dto';
 import { Response } from 'express';
-import { generateJWTTOken } from 'src/utils/generateToken';
+import {  generateJWTTokenAndStore } from 'src/utils/generateToken';
 import { LoginUserCommand } from './commands/login-user.command';
 
 @Controller('auth')
@@ -27,7 +27,7 @@ export class AuthController {
             createUserDto.age
         ))
 
-        generateJWTTOken(user.user.id, user.user.email, user.user.role, res);
+        generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
        
         return {
             message: 'User created successfully',
@@ -44,7 +44,7 @@ export class AuthController {
         ));
 
         // Generate JWT token
-        const token = generateJWTTOken(user.user.id, user.user.email, user.user.role, res);
+        const token = generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
 
         return {
             message: 'User logged in successfully',
