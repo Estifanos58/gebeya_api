@@ -20,14 +20,14 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
 
         // Check if user exists
         if(!user){
-            throw new HttpException({ message: "Invalid Creadential" }, HttpStatus.UNAUTHORIZED);
+            throw new HttpException({ message: "Invalid Credential" }, HttpStatus.UNAUTHORIZED);
         }
 
         // Compare the provided password with the stored hashed password
         const isPasswordValid = await comparePassword(password, user.password);
         
         if(!isPasswordValid){
-            throw new HttpException({ message: "Invalid Creadential" }, HttpStatus.UNAUTHORIZED);
+            throw new HttpException({ message: "Invalid Credential" }, HttpStatus.UNAUTHORIZED);
         }
 
         // If the password is valid, return user details (excluding password)
