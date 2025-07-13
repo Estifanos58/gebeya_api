@@ -44,4 +44,13 @@ export class User {
 
     @Column({name: "age" , type: "int", nullable: true })
     age: number;
+
+    @Column({ name: "otp", type: "int", nullable: true})
+    otp: number;
+
+    @Column({ name: "otpExpires_at", type: "timestamp", nullable: true})
+    otpExpires_at: Date;
+
+    @Column({name: "isEmailVerified", type: "boolean", default: false})
+    isEmailVerified: boolean;
 }

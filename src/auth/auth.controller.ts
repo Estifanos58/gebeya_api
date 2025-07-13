@@ -6,6 +6,7 @@ import { loginDto } from './dto/login-user.dto';
 import { Response } from 'express';
 import {  generateJWTTokenAndStore } from 'src/utils/generateToken';
 import { LoginUserCommand } from './commands/login-user.command';
+import { sendOtp } from 'src/utils/sendOtp';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +29,7 @@ export class AuthController {
         ))
 
         generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
+        sendOtp(user.user.otp,user.user.otpExpires_at, user.user.email);
        
         return res.status(201).json({ 
             message: 'User created successfully',
