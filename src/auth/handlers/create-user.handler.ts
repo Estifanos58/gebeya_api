@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateUserCommand } from "../commands/create-user.command";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "../entities/user";
+import { User, UserRole } from "../entities/user";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { hashedPassword } from "src/utils/hashedPassword";
@@ -12,7 +12,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     async execute(command: CreateUserCommand): Promise<any> {
         // Destructure the  Props
-        const { email, password, firstName, lastName, role, phoneNumber, address, profilePicture, age } = command;
+        const { email, password, firstName, lastName, role } = command;
 
         try {
                // Find if the user already exists
@@ -24,23 +24,28 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         // Hash Password
         const hashed = await hashedPassword(password);
 
+        const userRole = Object.values(UserRole).includes(role) ? role : UserRole.CUSTOMER;
+        const otp = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit OTP
+
         const user = await this.userRepo.save({
             email,
             password: hashed,
             firstName,
             lastName,
-            role,
-            phoneNumber: phoneNumber || null,
-            address: address || null,
-            profilePicture: profilePicture || null,
-            age: age || null
+            role: userRole,
+            otp: otp,
+            otpExpires_at: new Date(Date.now() + 10 * 60 * 1000), // OTP valid for 10 minutes
+            isEmailVerified: false // Default to false, will be updated after email verification
         })
 
-        const { password: _, ...userWithoutPassword } = user; // Exclude password from the response
+
+        
+        // Exclude password from the response
+        const {password:_,...userWithoutPassword} = user
 
         return {
             message: 'User created successfully',
-            user: userWithoutPassword
+            user: userWithoutPassword 
         }
         } catch (error) {
             throw new HttpException({message: "Error creating user",
