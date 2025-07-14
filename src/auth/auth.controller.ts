@@ -6,7 +6,8 @@ import { loginDto } from './dto/login-user.dto';
 import { Response, Request } from 'express';
 import {  generateJWTTokenAndStore } from 'src/utils/generateToken';
 import { LoginUserCommand } from './commands/login-user.command';
-import { sendOtp } from 'src/utils/sendOtp';
+import { VerifyOtpCommand } from './commands/verifyOtp.command';
+import { MailService } from 'src/mail/mail.service';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -17,7 +18,7 @@ declare module 'express' {
 
 @Controller('auth')
 export class AuthController {
-    constructor( private readonly commandBus: CommandBus){}
+    constructor( private readonly commandBus: CommandBus, private readonly mailService: MailService){}
     // Sign Up
 
     @Post('signup')
@@ -35,8 +36,19 @@ export class AuthController {
             createUserDto.age
         ))
 
-        await generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
-        await sendOtp(user.user.otp,user.user.otpExpires_at, user.user.email);
+        generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
+
+        // Send OTP to the user via email
+        const html = `<p>Welcome {name},</p>`;
+        const mail = {
+            to: user.user.email,
+            subject: 'Welcome to Our Service',
+            html: html,
+            placeholders: {
+                name: user.user.firstName
+            } 
+        }
+        await this.mailService.sendOtp(mail)
        
         return res.status(201).json({ 
             message: 'User created successfully',
@@ -67,8 +79,13 @@ export class AuthController {
     @Post('verify-otp')
     async verifyOtp(@Body() body: {otp: number}, @Req() req: Request, @Res() res: Response) {
         const { otp } = body;
+        if(!otp || typeof otp !== 'number' || otp.toString().length !== 6) {
+            return res.status(400).json({ message: 'Invalid OTP' });  
+        }  
         const user = req.user; // Assuming user is attached to the request in a real scenario 
 
-        
+        const isOtpValid = await this.commandBus.execute(new VerifyOtpCommand(user,otp));
+
     }
 }
+
