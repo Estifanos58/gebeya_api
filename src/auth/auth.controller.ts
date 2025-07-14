@@ -37,7 +37,18 @@ export class AuthController {
         ))
 
         generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
-        await this.mailService.sendOtp(user.user.otp,user.user.otpExpires_at, user.user.email);
+
+        // Send OTP to the user via email
+        const html = `<p>Welcome {name},</p>`;
+        const mail = {
+            to: user.user.email,
+            subject: 'Welcome to Our Service',
+            html: html,
+            placeholders: {
+                name: user.user.firstName
+            } 
+        }
+        await this.mailService.sendOtp(mail)
        
         return res.status(201).json({ 
             message: 'User created successfully',

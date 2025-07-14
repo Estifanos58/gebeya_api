@@ -1,21 +1,40 @@
-import { MailerService } from "@nestjs-modules/mailer";
+import { Injectable } from "@nestjs/common";
+import * as nodemailer from 'nodemailer';
+import { ConfigService } from "@nestjs/config";
 
+
+@Injectable()
 export class MailService {
-    constructor(
-        private readonly mailerService: MailerService,
-    ) {}
+    constructor( private readonly configService: ConfigService){}
+    emailTransport(){
+        const transporter = nodemailer.createTransport({
+            host: this.configService.get<string>('EMAIL_HOST') || 'sandbox.smtp.mailtrap.io',
+            port: this.configService.get<number>('PORT') || 2525,
+            auth: {
+                user: process.env.EMAIL_USERNAME,
+                pass: process.env.EMAIL_PASSWORD
+            }
+        })
 
-    async sendOtp(email: string, otp: number, otpExpiresAt: Date): Promise<void> {
+        return transporter;
+    }
+
+    async sendOtp(mail: SendMailType): Promise<void> {
+        const { to, html, placeholders, subject } = mail;
+        const transformHtml = substitutePlaceholders(html!, placeholders!);
         try {
-            await this.mailerService.sendMail({
-                from: "",
-                to: email,
-                subject: 'Your OTP Code',
-                html: `<p>Your OTP code is <strong>${otp}</strong>.</p>`
-            });
-            console.log(`OTP sent to ${email}. It will expire at ${otpExpiresAt}`);
+            const transporter = this.emailTransport();
+            const options: nodemailer.SendMailOptions = {
+                from: this.configService.get<string>('EMAIL_USERNAME'),
+                to: to,
+                subject: subject,
+                html: transformHtml
+            }
+
+            await transporter.sendMail(options);
+            console.log(`OTP sent to ${to}`);
         } catch (error) {
-            console.error(`Failed to send OTP to ${email}:`, error);
+            console.error(`Failed to send OTP to :`, error);
             throw new Error('Failed to send OTP');
         }
     }
