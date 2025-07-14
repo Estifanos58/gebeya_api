@@ -22,3 +22,12 @@ export const generateJWTTokenAndStore = (userId: string, email: string, role: st
     })
 
 }
+
+export const verifyToken = (token: string): any => {
+    const secretKey = process.env.JWT_SECRET || "THis_is_the_secret_toke";
+    const { userId } = jwt.verify(token, secretKey);
+    if (!userId) {
+        throw new Error('Invalid token');
+    }
+    return userId;
+}
