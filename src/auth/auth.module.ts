@@ -5,12 +5,14 @@ import { CreateUserHandler } from './handlers/create-user.handler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user';
 import { AuthenticateMiddleware } from 'src/middleware/authenticate.middleware';
+import { MailModule } from 'src/mail/mail.module';
 
 const CommandHandlers = [CreateUserHandler];
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]), // Assuming User entity is imported from the correct path
-    CqrsModule
+    CqrsModule,
+    MailModule
   ],
   controllers: [AuthController],
   providers: [...CommandHandlers],
