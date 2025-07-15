@@ -11,6 +11,7 @@ import { ConfigModule } from "@nestjs/config";
     ],
     controllers: [],
     providers: [MailService],
+    exports: [MailService] // Export the service to be used in other modules
 })
 
 export class MailModule{}

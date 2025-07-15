@@ -1,4 +1,4 @@
-function substitutePlaceholders(
+export function substitutePlaceholders(
   html: string,
   placeholders: Record<string, string>
 ): string {

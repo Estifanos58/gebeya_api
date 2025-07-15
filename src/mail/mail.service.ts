@@ -1,18 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from "@nestjs/config";
-
+import { substitutePlaceholders } from "src/utils/substituteHtlm";
 
 @Injectable()
 export class MailService {
     constructor( private readonly configService: ConfigService){}
     emailTransport(){
         const transporter = nodemailer.createTransport({
-            host: this.configService.get<string>('EMAIL_HOST') || 'sandbox.smtp.mailtrap.io',
-            port: this.configService.get<number>('PORT') || 2525,
+            host: this.configService.get<string>('GMAIL_HOST'), 
+            port: this.configService.get<number>('GMAIL_PORT'),
+            secure: false,
             auth: {
-                user: process.env.EMAIL_USERNAME,
-                pass: process.env.EMAIL_PASSWORD
+                user: this.configService.get<string>('GMAIL_USER'),
+                pass: this.configService.get<string>('GMAIL_PASSWORD')
             }
         })
 
@@ -25,7 +26,7 @@ export class MailService {
         try {
             const transporter = this.emailTransport();
             const options: nodemailer.SendMailOptions = {
-                from: this.configService.get<string>('EMAIL_USERNAME'),
+                from: this.configService.get<string>('GMAIL_USER'),
                 to: to,
                 subject: subject,
                 html: transformHtml

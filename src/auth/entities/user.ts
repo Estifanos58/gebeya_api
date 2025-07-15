@@ -53,4 +53,10 @@ export class User {
 
     @Column({name: "isEmailVerified", type: "boolean", default: false})
     isEmailVerified: boolean;
+
+    @Column({ name: "temporaryToken", nullable: true })
+    temporaryToken: string;
+
+    @Column({ name: "tokenExpiresAt", type: "timestamp", nullable: true })
+    tokenExpiresAt: Date;
 }
