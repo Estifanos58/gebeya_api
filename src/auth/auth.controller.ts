@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
@@ -10,6 +10,8 @@ import { VerifyOtpCommand } from './commands/verifyOtp.command';
 import { MailService } from 'src/mail/mail.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ForgotPasswordCommand } from './commands/forgot-password.command';
+import { ResetPasswordCommand } from './commands/reset-password.command';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -77,6 +79,22 @@ export class AuthController {
         const emailSent = await this.commandBus.execute(new ForgotPasswordCommand(email));
 
         return res.status(200).json(emailSent)
+    }
+
+    @Post('reset-password')
+    async resetPassword(@Query('token') token: string, @Query('email') email: string, @Body() body: ResetPasswordDto, @Res() res: Response) {
+        // Logic to reset password using the token and email
+        if(!token || !email) {
+            throw new HttpException({message: "Empty Fields Found"}, HttpStatus.BAD_REQUEST);
+        }
+        // This would typically involve validating the token and updating the user's password
+        // For simplicity, let's assume we have a service that handles this
+       const user= await this.commandBus.execute(new ResetPasswordCommand(token, email, body.newPassword, res));
+       
+        return res.status(200).json({
+            message: 'Password reset successfully',
+            user
+        });
     }
 }
 
