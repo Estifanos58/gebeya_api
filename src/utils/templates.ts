@@ -69,6 +69,77 @@ export const WELCOME_OTP_TEMPLATE = `
     </div>
   </body>
 </html>
+`
 
+export const PASSWORD_RESET_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Password Reset</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #0d6efd;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #0d6efd;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Reset Your Password</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+        <p>We received a request to reset your password. Click the button below to choose a new password:</p>
 
+        <a href="{resetLink}" class="button">Reset Password</a>
+
+        <p>This link will expire on <strong>{expiresAt}</strong>.</p>
+
+        <p>If you did not request a password reset, please ignore this email or contact our support team.</p>
+
+        <p>Thanks,<br />The Support Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
 `

@@ -5,6 +5,7 @@ import { User } from "../entities/user";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { comparePassword } from "src/utils/hashedPassword";
+import { generateJWTTokenAndStore } from "src/utils/generateToken";
 
 @CommandHandler(LoginUserCommand)
 export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
@@ -12,7 +13,7 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
     constructor(@InjectRepository(User) private readonly userRepo: Repository<User>){}
 
     async execute(command: LoginUserCommand): Promise<any> {
-        const { email, password } = command;
+        const { email, password, res } = command;
 
         // Logic to authenticate user
 
@@ -29,6 +30,10 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
         if(!isPasswordValid){
             throw new HttpException({ message: "Invalid Credential" }, HttpStatus.UNAUTHORIZED);
         }
+
+          // Generate JWT token
+        const token = generateJWTTokenAndStore(user.id, user.email, user.role, res);
+
 
         // If the password is valid, return user details (excluding password)
         const { password: _, ...userWithoutPassword } = user; // Exclude password from

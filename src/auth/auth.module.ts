@@ -6,8 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user';
 import { AuthenticateMiddleware } from 'src/middleware/authenticate.middleware';
 import { MailModule } from 'src/mail/mail.module';
+import { ForgotPasswordHandler } from './handlers/forgot-password.handler';
+import { LoginUserHandler } from './handlers/login-user.handler';
 
-const CommandHandlers = [CreateUserHandler];
+const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler];
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]), // Assuming User entity is imported from the correct path
@@ -19,6 +21,6 @@ const CommandHandlers = [CreateUserHandler];
 })
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
-      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup').forRoutes('auth/*path')
+      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup', 'auth/forgot-password').forRoutes('auth/*path')
   }
 }

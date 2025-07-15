@@ -6,14 +6,17 @@ import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { hashedPassword } from "src/utils/hashedPassword";
 import { generateOtp } from "src/utils/generateOtp";
+import { MailService } from "src/mail/mail.service";
+import { generateJWTTokenAndStore } from "src/utils/generateToken";
+import { WELCOME_OTP_TEMPLATE } from "src/utils/templates";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
-    constructor(@InjectRepository(User) private readonly userRepo: Repository<User>) {}
+    constructor(@InjectRepository(User) private readonly userRepo: Repository<User> , private readonly mailService: MailService) {}
 
     async execute(command: CreateUserCommand): Promise<any> {
         // Destructure the  Props
-        const { email, password: userPassword, firstName, lastName, role } = command;
+        const { email, password: userPassword, firstName, lastName, role, res } = command;
 
         try {
                // Find if the user already exists
@@ -39,6 +42,23 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             isEmailVerified: false // Default to false, will be updated after email verification
         })
 
+        generateJWTTokenAndStore(user.id, user.email, user.role, res!);
+        const token = generateOtp();
+
+        // Send OTP to the user via email
+        const html = WELCOME_OTP_TEMPLATE;
+        const mail = {
+            to: user.email,
+            subject: 'Welcome to Our Service',
+            html: html,
+            placeholders: {
+                name: user.firstName,
+                otp: user.otp.toString(),
+                expiresAt: user.otpExpires_at.toLocaleString(), // Format the date as needed
+                year: new Date().getFullYear().toString(),
+            } 
+        }
+        await this.mailService.sendOtp(mail)
 
         
         // Exclude password from the response

@@ -3,13 +3,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
 import { loginDto } from './dto/login-user.dto';
-import e, { Response, Request } from 'express';
+import { Response, Request } from 'express';
 import {  generateJWTTokenAndStore } from 'src/utils/generateToken';
 import { LoginUserCommand } from './commands/login-user.command';
 import { VerifyOtpCommand } from './commands/verifyOtp.command';
 import { MailService } from 'src/mail/mail.service';
-import { generateOtp } from 'src/utils/generateOtp';
-import { WELCOME_OTP_TEMPLATE } from 'src/utils/templates';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ForgotPasswordCommand } from './commands/forgot-password.command';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -35,26 +35,9 @@ export class AuthController {
             createUserDto.phoneNumber,
             createUserDto.address,
             createUserDto.profilePicture,
-            createUserDto.age
+            createUserDto.age,
+            res
         ))
-
-        generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
-        const token = generateOtp();
-
-        // Send OTP to the user via email
-        const html = WELCOME_OTP_TEMPLATE;
-        const mail = {
-            to: user.user.email,
-            subject: 'Welcome to Our Service',
-            html: html,
-            placeholders: {
-                name: user.user.firstName,
-                otp: user.user.otp,
-                expiresAt: user.user.otpExpires_at.toLocaleString(), // Format the date as needed
-                year: new Date().getFullYear().toString(),
-            } 
-        }
-        await this.mailService.sendOtp(mail)
        
         return res.status(201).json({ 
             message: 'User created successfully',
@@ -67,18 +50,12 @@ export class AuthController {
         // Logic for user login
         const user = await this.commandBus.execute(new LoginUserCommand(
             loginDto.email,
-            loginDto.password
+            loginDto.password,
+            res
         ));
-
-        // Generate JWT token
-        const token = generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
-
         return res.status(200).json({
             message: 'User logged in successfully',
-            user: {
-                ...user.user,
-                token
-            }
+            data: user 
         });
     }
 
@@ -89,9 +66,17 @@ export class AuthController {
             return res.status(400).json({ message: 'Invalid OTP' });  
         }  
         const user = req.user; // Assuming user is attached to the request in a real scenario 
+        const otpValid = await this.commandBus.execute(new VerifyOtpCommand(user,otp));
+       
+        return res.status(200).json(otpValid)
+    }
 
-        const isOtpValid = await this.commandBus.execute(new VerifyOtpCommand(user,otp));
+    @Post('forgot-password')
+    async forgotPassword(@Body() body: ForgotPasswordDto, @Res() res: Response) {
+        const {email} = body;
+        const emailSent = await this.commandBus.execute(new ForgotPasswordCommand(email));
 
+        return res.status(200).json(emailSent)
     }
 }
 
