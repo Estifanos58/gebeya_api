@@ -19,6 +19,6 @@ const CommandHandlers = [CreateUserHandler];
 })
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
-      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup').forRoutes('auth/*')
+      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup').forRoutes('auth/*path')
   }
 }

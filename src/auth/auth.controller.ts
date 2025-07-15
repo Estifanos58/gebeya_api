@@ -3,11 +3,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
 import { loginDto } from './dto/login-user.dto';
-import { Response, Request } from 'express';
+import e, { Response, Request } from 'express';
 import {  generateJWTTokenAndStore } from 'src/utils/generateToken';
 import { LoginUserCommand } from './commands/login-user.command';
 import { VerifyOtpCommand } from './commands/verifyOtp.command';
 import { MailService } from 'src/mail/mail.service';
+import { generateOtp } from 'src/utils/generateOtp';
+import { WELCOME_OTP_TEMPLATE } from 'src/utils/templates';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -37,15 +39,19 @@ export class AuthController {
         ))
 
         generateJWTTokenAndStore(user.user.id, user.user.email, user.user.role, res);
+        const token = generateOtp();
 
         // Send OTP to the user via email
-        const html = `<p>Welcome {name},</p>`;
+        const html = WELCOME_OTP_TEMPLATE;
         const mail = {
             to: user.user.email,
             subject: 'Welcome to Our Service',
             html: html,
             placeholders: {
-                name: user.user.firstName
+                name: user.user.firstName,
+                otp: user.user.otp,
+                expiresAt: user.user.otpExpires_at.toLocaleString(), // Format the date as needed
+                year: new Date().getFullYear().toString(),
             } 
         }
         await this.mailService.sendOtp(mail)

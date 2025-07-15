@@ -5,6 +5,7 @@ import { User, UserRole } from "../entities/user";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { hashedPassword } from "src/utils/hashedPassword";
+import { generateOtp } from "src/utils/generateOtp";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -12,7 +13,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     async execute(command: CreateUserCommand): Promise<any> {
         // Destructure the  Props
-        const { email, password, firstName, lastName, role } = command;
+        const { email, password: userPassword, firstName, lastName, role } = command;
 
         try {
                // Find if the user already exists
@@ -22,10 +23,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         }
 
         // Hash Password
-        const hashed = await hashedPassword(password);
+        const hashed = await hashedPassword(userPassword);
 
         const userRole = Object.values(UserRole).includes(role) ? role : UserRole.CUSTOMER;
-        const otp = Math.floor(100000 + Math.random() * 900000); // Generate a 6-digit OTP
+        const generatedotp = generateOtp();
 
         const user = await this.userRepo.save({
             email,
@@ -33,7 +34,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             firstName,
             lastName,
             role: userRole,
-            otp: otp,
+            otp: generatedotp,
             otpExpires_at: new Date(Date.now() + 10 * 60 * 1000), // OTP valid for 10 minutes
             isEmailVerified: false // Default to false, will be updated after email verification
         })
@@ -41,7 +42,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
         
         // Exclude password from the response
-        const {password:_,...userWithoutPassword} = user
+        const { password, otp, otpExpires_at, ...userWithoutPassword } = user
 
         return {
             message: 'User created successfully',
