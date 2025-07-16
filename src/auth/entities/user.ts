@@ -46,7 +46,7 @@ export class User {
     age: number;
 
     @Column({ name: "otp", type: "int", nullable: true})
-    otp: number;
+    otp: number | null;
 
     @Column({ name: "otpExpires_at", type: "timestamp", nullable: true})
     otpExpires_at: Date;
@@ -55,8 +55,8 @@ export class User {
     isEmailVerified: boolean;
 
     @Column({ name: "temporaryToken", nullable: true })
-    temporaryToken: string;
+    temporaryToken: string | null;
 
     @Column({ name: "tokenExpiresAt", type: "timestamp", nullable: true })
-    tokenExpiresAt: Date;
+    tokenExpiresAt: Date | null;
 }

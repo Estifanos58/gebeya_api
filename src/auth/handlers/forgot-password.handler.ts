@@ -43,7 +43,7 @@ export class ForgotPasswordHandler
       const html = PASSWORD_RESET_TEMPLATE;
       const mail = {
         to: user.email,
-        subject: 'Welcome to Our Service',
+        subject: 'Password Reset Request',
         html: html,
         placeholders: {
           name: user.firstName,

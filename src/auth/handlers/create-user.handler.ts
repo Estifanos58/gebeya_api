@@ -66,7 +66,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
         return {
             message: 'User created successfully',
-            user: userWithoutPassword 
+            data: userWithoutPassword 
         }
         } catch (error) {
             throw new HttpException({message: "Error creating user",
