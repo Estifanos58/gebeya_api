@@ -3,6 +3,7 @@ import { AuthController } from './auth.controller';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRole } from './entities/user';
+import { loginDto } from './dto/login-user.dto';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -89,4 +90,51 @@ describe('AuthController', () => {
       expect(result).toEqual(expectedResponse);
     });
   });
+
+  describe('login', () => {
+  it('should login a user and return success message', async () => {
+    const loginDto: loginDto = {
+      email: 'estifkebe@gmail.com',
+      password: '123123424242',
+    };
+
+    const expectedUser = {
+      id: 1,
+      email: loginDto.email,
+      firstName: 'Test',
+      lastName: 'User',
+      phoneNumber: null,
+      address: null,
+      profilePicture: null,
+      age: null,
+    };
+
+    const expectedResponse = {
+      message: 'User logged in successfully',
+      data: expectedUser,
+    };
+
+    const json = jest.fn().mockReturnValue(expectedResponse); // ✅ fixed here
+    const status = jest.fn().mockReturnValue({ json });
+    const res = { status } as any;
+
+    mockCommandBus.execute.mockResolvedValue(expectedUser); // ✅ just return the user (not wrapped in data)
+
+    // ACT
+    const result = await authController.login(loginDto, res);
+
+    // ASSERT
+    expect(commandBus.execute).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: loginDto.email,
+        password: loginDto.password,
+        res,
+      })
+    );
+    expect(status).toHaveBeenCalledWith(200);
+    expect(json).toHaveBeenCalledWith(expectedResponse);
+    expect(result).toEqual(expectedResponse);
+  });
+});
+
 });
