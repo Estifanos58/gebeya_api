@@ -4,10 +4,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
 import { loginDto } from './dto/login-user.dto';
 import { Response, Request } from 'express';
-import {  generateJWTTokenAndStore } from 'src/utils/generateToken';
 import { LoginUserCommand } from './commands/login-user.command';
 import { VerifyOtpCommand } from './commands/verifyOtp.command';
-import { MailService } from 'src/mail/mail.service';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ForgotPasswordCommand } from './commands/forgot-password.command';
 import { ResetPasswordCommand } from './commands/reset-password.command';
@@ -22,7 +20,7 @@ declare module 'express' {
 
 @Controller('auth')
 export class AuthController {
-    constructor( private readonly commandBus: CommandBus, private readonly mailService: MailService){}
+    constructor( private readonly commandBus: CommandBus){}
     // Sign Up
 
     @Post('signup')
@@ -41,10 +39,7 @@ export class AuthController {
             res
         ))
        
-        return res.status(201).json({ 
-            message: 'User created successfully',
-            user
-        })
+        return res.status(201).json({...user})
     }
 
     @Post('login')
