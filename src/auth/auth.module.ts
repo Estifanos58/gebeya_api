@@ -18,6 +18,7 @@ const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHand
   ],
   controllers: [AuthController],
   providers: [...CommandHandlers],
+  exports: [User]
 })
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
