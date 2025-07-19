@@ -3,10 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './auth/entities/user';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { StoreModule } from './store/store.module';
+import { User, Cart, CartItem, Product, ProductSkus, Category, Payment, OrderDetails } from './entities';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { StoreModule } from './store/store.module';
         username: "estif",
         password: "mypassword",
         database: "gebeya",
-        entities: [User],
+        entities: [User,CartItem,Cart, OrderDetails, Payment, Product, ProductSkus, Category],
         synchronize: true
       })
     ,
