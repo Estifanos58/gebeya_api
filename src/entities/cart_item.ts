@@ -11,7 +11,7 @@ export class CartItem {
     cartId: Cart["id"];
 
     @Column({name: "product_skul_id"})
-    productSkulId: ProductSkus["id"];
+    productSkuId: ProductSkus["id"];
 
     @Column({name: "quantity"})
     quantity: number;

@@ -16,7 +16,7 @@ export class ProductSkus{
     @Column({name: "product_id"})
     productId: Product["id"];
 
-    @Column({name: "size", enum: Size})
+    @Column({name: "size", type: "enum" , enum: Size})
     size: Size
 
     @Column({name: "price"})

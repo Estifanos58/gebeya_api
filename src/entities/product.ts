@@ -15,6 +15,6 @@ export class Product {
     @Column({name: "cover"})
     cover: string;
 
-    @Column({name: "catagoy_id"})
-    catagoryId: Category["id"];
+    @Column({name: "category_id"})
+    categoryId: Category["id"];
 }

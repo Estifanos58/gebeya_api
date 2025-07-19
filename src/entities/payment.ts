@@ -18,6 +18,6 @@ export class Payment {
     @Column({name: "amount"})
     amount: number;
 
-    @Column({name: "status", enum: Status})
+    @Column({name: "status", type: "enum", enum: Status})
     status: Status
 }
