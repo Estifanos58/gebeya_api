@@ -2,7 +2,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { AuthController } from './auth.controller';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserRole } from './entities/user';
+import { UserRole } from '@/entities';
 import { loginDto } from './dto/login-user.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';

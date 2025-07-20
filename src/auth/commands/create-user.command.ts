@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { UserRole } from "../entities/user";
+import { UserRole } from "@/entities";
 
 export class CreateUserCommand {
     constructor(
