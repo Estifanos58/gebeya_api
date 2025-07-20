@@ -1,4 +1,4 @@
-import { UserRole } from "../entities/user";
+import { UserRole } from "@/entities";
 import { IsEmail, IsNotEmpty, IsOptional, IsString, IsEnum, IsInt, Min } from "class-validator";
 
 export class CreateUserDto {

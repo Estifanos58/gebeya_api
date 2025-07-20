@@ -2,7 +2,7 @@ import { ICommandHandler } from '@nestjs/cqrs';
 import { VerifyOtpCommand } from '../commands/verifyOtp.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user';
+import { User } from '@/entities';
 import { Repository } from 'typeorm';
 
 export class VerifyOtpHandler implements ICommandHandler<VerifyOtpCommand> {

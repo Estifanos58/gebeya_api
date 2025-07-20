@@ -2,7 +2,7 @@ import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { ResetPasswordCommand } from '../commands/reset-password.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user';
+import { User } from '@/entities';
 import { Repository } from 'typeorm';
 import { hashedPassword } from 'src/utils/hashedPassword';
 import { PASSWROD_RESET_SUCCESS_TEMPLATE } from 'src/utils/templates';

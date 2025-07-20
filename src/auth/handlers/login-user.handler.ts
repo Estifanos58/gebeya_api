@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { LoginUserCommand } from "../commands/login-user.command";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "../entities/user";
+import { User } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { comparePassword } from "src/utils/hashedPassword";
