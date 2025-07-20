@@ -1,20 +1,25 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Category } from "./categories";
+import { ProductSkus } from "./product_skus";
 
-@Entity({name: "products"})
+@Entity({ name: "products" })
 export class Product {
-    @PrimaryGeneratedColumn("uuid", {name: "id"})
-    id: string;
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
+  id: string;
 
-    @Column({name: "name"})
-    name: string;
+  @Column()
+  name: string;
 
-    @Column({name: "description", nullable: true})
-    description: string;
+  @Column({ nullable: true })
+  description: string;
 
-    @Column({name: "cover"})
-    cover: string;
+  @Column()
+  cover: string;
 
-    @Column({name: "category_id"})
-    categoryId: Category["id"];
+  @ManyToOne(() => Category)
+  @JoinColumn({ name: "category_id" })
+  category: Category;
+
+  @OneToMany(() => ProductSkus, (sku) => sku.product)
+  skus: ProductSkus[];
 }

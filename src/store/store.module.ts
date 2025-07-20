@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { StoreController } from "./store.controller";
-import { User } from "../auth/entities/user"
+// import { User } from "@/entities/user"
 import { AuthenticateMiddleware } from "@/middleware/authenticate.middleware";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { Store } from "./entities/store";
+// import { TypeOrmModule } from "@nestjs/typeorm";
+// import { Store } from "./entities/store";
+import { EntityModule } from "@/entities/entity.module";
 import { CqrsModule } from "@nestjs/cqrs";
 import { MailModule } from "@/mail/mail.module";
 import { CreateStoreHandler } from "./handlers/createStore.handler";
@@ -12,10 +13,11 @@ const CommandHandler = [CreateStoreHandler]
 
 @Module({
     imports:[
-    TypeOrmModule.forFeature([Store]),
+    // TypeOrmModule.forFeature([Store]), 
     CqrsModule,
     MailModule,
-    User
+    EntityModule
+    // User
     ],
     controllers:[StoreController],
     providers:[...CommandHandler]

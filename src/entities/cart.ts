@@ -1,17 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
-import { ProductSkus } from "./product_skus";
+import { CartItem } from "./cart_item";
 
-@Entity({name: "cart"})
+@Entity({ name: "cart" })
 export class Cart {
-    @PrimaryGeneratedColumn("uuid", {name: "id"})
-    id: string;
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
+  id: string;
 
-    @Column({name: "user_id"})
-    userId: User["id"];
+  @ManyToOne(() => User, (user) => user.carts)
+  @JoinColumn({ name: "user_id" })
+  user: User;
 
-    // @Column({name : "total"})
-    // total: number;
-
-
+  @OneToMany(() => CartItem, (item) => item.cart, { cascade: true })
+  cartItems: CartItem[];
 }

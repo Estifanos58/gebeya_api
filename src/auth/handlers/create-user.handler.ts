@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateUserCommand } from "../commands/create-user.command";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User, UserRole } from "@/entities";
+import { Credentials, User, UserRole } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { hashedPassword } from "src/utils/hashedPassword";
@@ -12,7 +12,11 @@ import { WELCOME_OTP_TEMPLATE } from "src/utils/templates";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
-    constructor(@InjectRepository(User) private readonly userRepo: Repository<User> , private readonly mailService: MailService) {}
+    constructor(
+        @InjectRepository(User) private readonly userRepo: Repository<User>, 
+        @InjectRepository(Credentials) private readonly credential: Repository<Credentials>, 
+        private readonly mailService: MailService
+    ) {}
 
     async execute(command: CreateUserCommand): Promise<any> {
         // Destructure the  Props
@@ -33,13 +37,17 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
         const user = await this.userRepo.save({
             email,
-            password: hashed,
             firstName,
             lastName,
             role: userRole,
+            isEmailVerified: false // Default to false, will be updated after email verification
+        })
+
+        const credentials = await this.credential.save({
+            user: user,
+            password: hashed,
             otp: generatedotp,
             otpExpires_at: new Date(Date.now() + 10 * 60 * 1000), // OTP valid for 10 minutes
-            isEmailVerified: false // Default to false, will be updated after email verification
         })
 
         generateJWTTokenAndStore(user.id, user.email, user.role, res!);
@@ -53,8 +61,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             html: html,
             placeholders: {
                 name: user.firstName,
-                otp: user.otp.toString(),
-                expiresAt: user.otpExpires_at.toLocaleString(), // Format the date as needed
+                otp: credentials?.otp.toString(),
+                expiresAt: credentials.otpExpires_at.toLocaleString(), // Format the date as needed
                 year: new Date().getFullYear().toString(),
             } 
         }
@@ -62,7 +70,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
         
         // Exclude password from the response
-        const { password, otp, otpExpires_at, ...userWithoutPassword } = user
+        const { ...userWithoutPassword } = user
 
         return {
             message: 'User created successfully',

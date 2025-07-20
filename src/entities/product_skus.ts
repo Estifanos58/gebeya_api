@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Product } from "./product";
+import { CartItem } from "./cart_item";
 
 export enum Size{
     LARGE = "lg",
@@ -8,23 +9,27 @@ export enum Size{
     VERY_SMALL= "vsm"
 }
 
-@Entity({name: "product_skus"})
-export class ProductSkus{
-    @PrimaryGeneratedColumn("uuid", {name: "id"})
-    id: string;
+@Entity({ name: "product_skus" })
+export class ProductSkus {
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
+  id: string;
 
-    @Column({name: "product_id"})
-    productId: Product["id"];
+  @ManyToOne(() => Product, (product) => product.skus)
+  @JoinColumn({ name: "product_id" })
+  product: Product;
 
-    @Column({name: "size", type: "enum" , enum: Size})
-    size: Size
+  @OneToMany(() => CartItem, (item) => item.productSku)
+  cartItems: CartItem[];
 
-    @Column({name: "price"})
-    price: string;
+  @Column({ name: "size", type: "enum", enum: Size })
+  size: Size;
 
-    @Column({name: "quantity"})
-    quantity: number;
+  @Column()
+  price: string;
 
-    @Column({name: "prev_price"})
-    prevPrice: number;
+  @Column()
+  quantity: number;
+
+  @Column({ name: "prev_price" })
+  prevPrice: number;
 }

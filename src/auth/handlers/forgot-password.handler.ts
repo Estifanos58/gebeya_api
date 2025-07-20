@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForgotPasswordCommand } from '../commands/forgot-password.command';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '@/entities';
-import { Repository } from 'typeorm';
+import { Credentials, User } from '@/entities';
+import { In, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { generateUniqueToken } from 'src/utils/generateOtp';
 import { PASSWORD_RESET_TEMPLATE } from 'src/utils/templates';
@@ -14,6 +14,7 @@ export class ForgotPasswordHandler
 {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(Credentials) private readonly credential: Repository<Credentials>,
     private readonly mailService: MailService,
   ) {}
 
@@ -31,10 +32,16 @@ export class ForgotPasswordHandler
       }
       // we will generate a unique token for the user
       const temporaryToken = generateUniqueToken();
-
+      const credentials = await this.credential.findOne({ where: { user: { id: user.id } } });
+      if (!credentials) {
+        throw new HttpException(
+          { message: 'Credentials not found for the user' },
+          HttpStatus.NOT_FOUND,
+        );
+      }
       // Set the temporary token and its expiration time
-      user.temporaryToken = temporaryToken;
-      user.tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // Token valid for 15 minutes
+      credentials.temporaryToken = temporaryToken;
+      credentials.tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // Token valid for 15 minutes
 
       // send an Email to the user with the reset link
       const link = `https://yourapp.com/reset-password?token=${temporaryToken}&email=${email}`;
@@ -48,7 +55,7 @@ export class ForgotPasswordHandler
         placeholders: {
           name: user.firstName,
           resetLink: link,
-          expiresAt: user.tokenExpiresAt.toLocaleString(), // Format the date as needed
+          expiresAt: credentials.tokenExpiresAt.toLocaleString(), // Format the date as needed
           year: new Date().getFullYear().toString(),
         },
       };

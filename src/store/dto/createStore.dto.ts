@@ -1,4 +1,4 @@
-import { User } from "@/auth/entities/user";
+import { User } from "@/entities";
 
 export class CreateStoreDto {
     
