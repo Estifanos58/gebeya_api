@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { OrderDetails } from "./order_details";
 
 export enum Status {
@@ -7,17 +7,17 @@ export enum Status {
     CANCELED = "canceled"
 }
 
-@Entity({name: "payment"})
+@Entity({ name: "payment" })
 export class Payment {
-    @PrimaryGeneratedColumn("uuid", {name: "id"})
-    id: string;
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
+  id: string;
 
-    @Column({name: "order_id"})
-    orderId: OrderDetails["id"];
+  @OneToOne(() => OrderDetails, (order) => order.payment)
+  order: OrderDetails;
 
-    @Column({name: "amount"})
-    amount: number;
+  @Column()
+  amount: number;
 
-    @Column({name: "status", type: "enum", enum: Status})
-    status: Status
+  @Column({ type: "enum", enum: Status })
+  status: Status;
 }

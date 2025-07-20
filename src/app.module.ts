@@ -15,6 +15,7 @@ import {
   Category,
   Payment,
   OrderDetails,
+  Credentials
 } from './entities';
 import { EntityModule } from './entities/entity.module';
 
@@ -36,6 +37,7 @@ import { EntityModule } from './entities/entity.module';
         Product,
         ProductSkus,
         Category,
+        Credentials
       ], // This is imported for the synchrozation
       synchronize: true,
     }),

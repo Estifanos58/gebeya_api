@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { LoginUserCommand } from "../commands/login-user.command";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "@/entities";
-import { Repository } from "typeorm";
+import { Credentials, User } from "@/entities";
+import { In, Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { comparePassword } from "src/utils/hashedPassword";
 import { generateJWTTokenAndStore } from "src/utils/generateToken";
@@ -10,7 +10,10 @@ import { generateJWTTokenAndStore } from "src/utils/generateToken";
 @CommandHandler(LoginUserCommand)
 export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
 
-    constructor(@InjectRepository(User) private readonly userRepo: Repository<User>){}
+    constructor(
+        @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(Credentials) private readonly credential: Repository<Credentials>,
+    ){}
 
     async execute(command: LoginUserCommand): Promise<any> {
         const { email, password, res } = command;
@@ -23,9 +26,15 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
         if(!user){
             throw new HttpException({ message: "Invalid Credential" }, HttpStatus.UNAUTHORIZED);
         }
+        
+        // Find credentials associated with the user
+        const credentials = await this.credential.findOne({ where: { user: { id: user.id } } });
+        if(!credentials){
+            throw new HttpException({ message: "Credentials not found for the user" }, HttpStatus.NOT_FOUND);
+        }
 
         // Compare the provided password with the stored hashed password
-        const isPasswordValid = await comparePassword(password, user.password);
+        const isPasswordValid = await comparePassword(password, credentials.password);
         
         if(!isPasswordValid){
             throw new HttpException({ message: "Invalid Credential" }, HttpStatus.UNAUTHORIZED);
@@ -36,12 +45,12 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
 
 
         // If the password is valid, return user details (excluding password)
-        const { password: _, ...userWithoutPassword } = user; // Exclude password from
+        const {...userWithoutSensetiveData } = user; // Exclude password from
 
         return {
             message: 'User logged in successfully',
             user: {
-                userWithoutPassword,
+                userWithoutSensetiveData,
             }
         };
     }

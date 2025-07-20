@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NextFunction, Request, Response } from "express";
-import { User } from "src/auth/entities/user";
+import { User } from "@/entities";
 import { verifyToken } from "src/utils/generateToken";
 import { Repository } from "typeorm";
 

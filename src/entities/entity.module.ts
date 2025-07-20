@@ -9,6 +9,7 @@ import {
   User,
   Payment,
   OrderDetails,
+  Credentials
 } from './index';
 
 @Module({
@@ -22,6 +23,7 @@ import {
       User,
       Payment,
       OrderDetails,
+      Credentials
     ]),
   ],
   exports:[TypeOrmModule]

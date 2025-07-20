@@ -1,18 +1,17 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Payment } from "./payment";
 
-@Entity({name: "order_details"})
+@Entity({ name: "order_details" })
 export class OrderDetails {
-    @PrimaryGeneratedColumn("uuid", {name: "id"})
-    id: string;
+  @PrimaryGeneratedColumn("uuid", { name: "id" })
+  id: string;
 
-    @Column({name: "user_id"})
-    userId: User["id"];
+  @ManyToOne(() => User)
+  @JoinColumn({ name: "user_id" })
+  user: User;
 
-    @Column({name: "payment_id"})
-    paymentId: Payment["id"];
-
-    // @Column({name: "total"})
-    // total: number;
+  @OneToOne(() => Payment, (payment) => payment.order, { cascade: true })
+  @JoinColumn({ name: "payment_id" })
+  payment: Payment;
 }

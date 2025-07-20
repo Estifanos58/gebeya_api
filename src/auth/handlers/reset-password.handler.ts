@@ -2,7 +2,7 @@ import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs';
 import { ResetPasswordCommand } from '../commands/reset-password.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '@/entities';
+import { Credentials, User } from '@/entities';
 import { Repository } from 'typeorm';
 import { hashedPassword } from 'src/utils/hashedPassword';
 import { PASSWROD_RESET_SUCCESS_TEMPLATE } from 'src/utils/templates';
@@ -13,13 +13,14 @@ export class ResetPasswordHandler
 {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
+    @InjectRepository(Credentials) private readonly credential: Repository<Credentials>,
   ) {}
 
   async execute(command: ResetPasswordCommand): Promise<any> {
     const { token, email, newPassword, res } = command;
     try {
       const user = await this.userRepo.findOne({
-        where: { email, temporaryToken: token },
+        where: { email},
       });
 
       if (!user) {
@@ -29,8 +30,16 @@ export class ResetPasswordHandler
         );
       }
 
+      const creadentials = await this.credential.findOne({
+        where: { user: { id: user.id }, temporaryToken: token },
+      });
+
+      if(!creadentials) {
+        throw new HttpException({ message: "Credentials For this User Not Found" }, HttpStatus.UNAUTHORIZED);
+      }
+
       // Check if the token is still valid
-      if (user.tokenExpiresAt && user.tokenExpiresAt < new Date()) {
+      if (creadentials?.tokenExpiresAt && creadentials?.tokenExpiresAt < new Date()) {
         throw new HttpException(
           { message: 'Token has expired' },
           HttpStatus.UNAUTHORIZED,
@@ -39,11 +48,12 @@ export class ResetPasswordHandler
 
       const hashed = await hashedPassword(newPassword);
       // Update the user's password
-      user.password = hashed;
-      user.temporaryToken = null; // Clear the temporary token
-      user.tokenExpiresAt = null; // Clear the token expiration time
+      creadentials.password = hashed;
+      creadentials.temporaryToken = null; // Clear the temporary token
+      creadentials.tokenExpiresAt = null; // Clear the token expiration time
 
-      await this.userRepo.save(user);
+      // Save the updated credentials
+      await this.credential.save(creadentials);
 
       const link = `https://yourapp.com/support`;
       const html = PASSWROD_RESET_SUCCESS_TEMPLATE;
@@ -59,7 +69,7 @@ export class ResetPasswordHandler
         },
       };
 
-      const {password, otp, otpExpires_at, tokenExpiresAt, temporaryToken, ...userWithoutSensitiveData } = user
+      const {...userWithoutSensitiveData } = user
       
       return userWithoutSensitiveData;
     } catch (error) {
