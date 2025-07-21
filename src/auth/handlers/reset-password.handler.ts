@@ -30,9 +30,7 @@ export class ResetPasswordHandler
         );
       }
 
-      const creadentials = await this.credential.findOne({
-        where: { user: { id: user.id }, temporaryToken: token },
-      });
+      const creadentials = await this.credential.findOne({where: {user: {id: user.id}, temporaryToken: token}});
 
       if(!creadentials) {
         throw new HttpException({ message: "Credentials For this User Not Found" }, HttpStatus.UNAUTHORIZED);

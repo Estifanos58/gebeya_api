@@ -43,6 +43,8 @@ export class ForgotPasswordHandler
       credentials.temporaryToken = temporaryToken;
       credentials.tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // Token valid for 15 minutes
 
+      await this.credential.save(credentials);
+
       // send an Email to the user with the reset link
       const link = `https://yourapp.com/reset-password?token=${temporaryToken}&email=${email}`;
 

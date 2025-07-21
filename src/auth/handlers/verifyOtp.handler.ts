@@ -1,10 +1,12 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { VerifyOtpCommand } from '../commands/verifyOtp.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Credentials, User } from '@/entities';
 import { Repository } from 'typeorm';
 
+
+@CommandHandler(VerifyOtpCommand)
 export class VerifyOtpHandler implements ICommandHandler<VerifyOtpCommand> {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,

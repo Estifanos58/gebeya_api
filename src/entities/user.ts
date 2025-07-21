@@ -47,10 +47,11 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
-  @OneToMany(() => Cart, (cart) => cart.user)
+  @OneToMany(() => Cart, (cart) => cart.user, {cascade: true})
   carts: Cart[];
 
-  @OneToOne(() => Credentials, (credentials) => credentials.user)
+  @OneToOne(() => Credentials, (credentials) => credentials.user, {onDelete: "CASCADE", cascade: true})
+  @JoinColumn({ name: "credentials_id" })
   credentials: Credentials;
 }
 
