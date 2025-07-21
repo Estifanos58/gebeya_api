@@ -5,7 +5,7 @@
  - [x] Roles: (admin, merchant, customer, delivery)
  - [x] Email verification via OTP
  - [x] Password reset via email + expiration
- - [] Refresh token + Access token management
+ - [x] Refresh token + Access token management
  - [] Rate-limiting on Login, OTP, reset
  - [] Session activity tracking (devices, IP)
  - [] User ban. disable by admin

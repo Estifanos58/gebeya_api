@@ -12,8 +12,9 @@ import { EntityModule } from '@/entities/entity.module';
 import { VerifyOtpHandler } from './handlers/verifyOtp.handler';
 import { ResetPasswordHandler } from './handlers/reset-password.handler';
 import { GetUserHandler } from './handlers/get-user.handler';
+import { RefreshTokenHandler } from './handlers/refresh-token.handler';
 
-const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler, VerifyOtpHandler, ResetPasswordHandler];
+const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler, VerifyOtpHandler, ResetPasswordHandler, RefreshTokenHandler];
 const QueryHandlers = [GetUserHandler];
 @Module({
   imports: [

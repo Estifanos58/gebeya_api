@@ -55,8 +55,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             password: hashed,
             otp: generatedotp,
             otpExpires_at: new Date(Date.now() + 10 * 60 * 1000), // OTP valid for 10 minutes
-            refresh_token: refreshToken,
-            refresh_token_expires_at: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // Refresh token valid for 15 days
+            refreshToken: refreshToken,
+            refreshTokenExpiresAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // Refresh token valid for 15 days
         })
 
 

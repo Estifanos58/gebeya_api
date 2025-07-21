@@ -11,7 +11,7 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery>{
         @InjectRepository(User) private readonly userRepo: Repository<User>
     ){}
     async execute(query: GetUserQuery): Promise<any> {
-        const {user} = query;
+        const {user} = query; 
 
         if(!user){
             throw new HttpException({ message: "User Not Found"}, HttpStatus.NOT_FOUND)

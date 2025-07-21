@@ -92,14 +92,14 @@ export class AuthController {
         return res.status(200).json({...user});
     }
 
-    @Get("/refresh-token")
+    @Get("refresh-token")
     async refreshToken(@Req() req: Request, @Res() res: Response){
         const user = await this.commandBus.execute(new RefreshTokenCommand(req, res))
 
         res.status(200).json({...user});
     }
 
-    @Get("/me")
+    @Get("me")
     async getUserData(@Req() req: Request, @Res() res: Response){
         const user = await this.queryBus.execute(new GetUserQuery(req.user))
         res.status(200).json({...user});
