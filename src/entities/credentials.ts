@@ -6,7 +6,7 @@ export class Credentials {
   @PrimaryGeneratedColumn("uuid", { name: "id" })
   id: string;
 
-  @OneToOne(() => User, (user) => user.credentials, { eager: true })
+  @OneToOne(() => User, (user) => user.credentials, { eager: true  })
   @JoinColumn({ name: "user_id" })
   user: User;
 

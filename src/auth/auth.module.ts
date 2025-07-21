@@ -9,8 +9,12 @@ import { MailModule } from 'src/mail/mail.module';
 import { ForgotPasswordHandler } from './handlers/forgot-password.handler';
 import { LoginUserHandler } from './handlers/login-user.handler';
 import { EntityModule } from '@/entities/entity.module';
+import { VerifyOtpHandler } from './handlers/verifyOtp.handler';
+import { ResetPasswordHandler } from './handlers/reset-password.handler';
+import { GetUserHandler } from './handlers/get-user.handler';
 
-const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler];
+const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler, VerifyOtpHandler, ResetPasswordHandler];
+const QueryHandlers = [GetUserHandler];
 @Module({
   imports: [
     // TypeOrmModule.forFeature([User]), // Assuming User entity is imported from the correct path
@@ -19,7 +23,7 @@ const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHand
     MailModule
   ],
   controllers: [AuthController],
-  providers: [...CommandHandlers],
+  providers: [...CommandHandlers, ...QueryHandlers],
 })
 export class AuthModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

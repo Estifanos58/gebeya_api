@@ -54,7 +54,7 @@ export class AuthController {
             loginDto.password,
             res
         ));
-        return res.status(200).json(...user);
+        return res.status(200).json({...user});
     }
 
     @Post('verify-otp')
@@ -83,6 +83,7 @@ export class AuthController {
         if(!token || !email) {
             throw new HttpException({message: "Empty Fields Found"}, HttpStatus.BAD_REQUEST);
         }
+        console.log({"Token: ": token, "Email: ": email})
         // This would typically involve validating the token and updating the user's password
         // For simplicity, let's assume we have a service that handles this
        const user= await this.commandBus.execute(new ResetPasswordCommand(token, email, body.newPassword, res));
@@ -93,6 +94,7 @@ export class AuthController {
     @Get("/me")
     async getUserData(@Req() req: Request, @Res() res: Response){
         const user = await this.queryBus.execute(new GetUserQuery(req.user))
+        res.status(200).json({...user});
     }
 }
 

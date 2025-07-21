@@ -25,8 +25,8 @@ export class AuthenticateMiddleware implements NestMiddleware{
      */
     async use(req: Request, res: Response, next: NextFunction) {
         // Extract the token from the request cookies
-        const token = req.cookies.token;  
-
+        const {token} = req.cookies;  
+        // console.log("Token from cookies:", token);
         // If no token is found, return unauthorized response
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });

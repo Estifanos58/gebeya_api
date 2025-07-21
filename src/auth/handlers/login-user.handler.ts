@@ -49,9 +49,7 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
 
         return {
             message: 'User logged in successfully',
-            user: {
-                userWithoutSensetiveData,
-            }
+            user: userWithoutSensetiveData
         };
     }
 }
