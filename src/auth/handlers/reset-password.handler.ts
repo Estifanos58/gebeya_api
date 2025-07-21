@@ -71,7 +71,10 @@ export class ResetPasswordHandler
 
       const {...userWithoutSensitiveData } = user
       
-      return userWithoutSensitiveData;
+      return {
+            message: 'Password reset successfully',
+            data: userWithoutSensitiveData
+        }
     } catch (error) {
       // Handle errors appropriately, e.g., user not found, token expired, etc.
       throw new HttpException(

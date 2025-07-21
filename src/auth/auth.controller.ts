@@ -1,6 +1,6 @@
-import { Body, Controller, HttpException, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Query, Req, Res } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from './commands/create-user.command';
 import { loginDto } from './dto/login-user.dto';
 import { Response, Request } from 'express';
@@ -10,6 +10,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ForgotPasswordCommand } from './commands/forgot-password.command';
 import { ResetPasswordCommand } from './commands/reset-password.command';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { GetUserQuery } from './queries/get-user-query';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -20,7 +21,10 @@ declare module 'express' {
 
 @Controller('auth')
 export class AuthController {
-    constructor( private readonly commandBus: CommandBus){}
+    constructor( 
+        private readonly commandBus: CommandBus,
+        private readonly queryBus: QueryBus
+    ){}
     // Sign Up
 
     @Post('signup')
@@ -50,10 +54,7 @@ export class AuthController {
             loginDto.password,
             res
         ));
-        return res.status(200).json({
-            message: 'User logged in successfully',
-            data: user 
-        });
+        return res.status(200).json(...user);
     }
 
     @Post('verify-otp')
@@ -65,7 +66,7 @@ export class AuthController {
         const user = req.user; // Assuming user is attached to the request in a real scenario 
         const otpValid = await this.commandBus.execute(new VerifyOtpCommand(user,otp));
        
-        return res.status(200).json(otpValid)
+        return res.status(200).json({...otpValid})
     }
 
     @Post('forgot-password')
@@ -73,7 +74,7 @@ export class AuthController {
         const {email} = body;
         const emailSent = await this.commandBus.execute(new ForgotPasswordCommand(email));
 
-        return res.status(200).json(emailSent)
+        return res.status(200).json({...emailSent})
     }
 
     @Post('reset-password')
@@ -86,10 +87,12 @@ export class AuthController {
         // For simplicity, let's assume we have a service that handles this
        const user= await this.commandBus.execute(new ResetPasswordCommand(token, email, body.newPassword, res));
        
-        return res.status(200).json({
-            message: 'Password reset successfully',
-            user
-        });
+        return res.status(200).json({...user});
+    }
+
+    @Get("/me")
+    async getUserData(@Req() req: Request, @Res() res: Response){
+        const user = await this.queryBus.execute(new GetUserQuery(req.user))
     }
 }
 
