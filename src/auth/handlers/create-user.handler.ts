@@ -7,7 +7,7 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 import { hashedPassword } from "src/utils/hashedPassword";
 import { generateOtp } from "src/utils/generateOtp";
 import { MailService } from "src/mail/mail.service";
-import { generateJWTTokenAndStore } from "src/utils/generateToken";
+import { generateJWTToken, storeTokenInCookie } from "src/utils/generateToken";
 import { WELCOME_OTP_TEMPLATE } from "src/utils/templates";
 
 @CommandHandler(CreateUserCommand)
@@ -43,14 +43,24 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
             isEmailVerified: false // Default to false, will be updated after email verification
         })
 
+        const accessToken = generateJWTToken(user.id, user.email , user.role, false);
+        const refreshToken = generateJWTToken(user.id, user.email, user.role, true);
+
+        // Set the access and refersh token in the response cookie
+        storeTokenInCookie(res!, accessToken, false);
+        storeTokenInCookie(res!, refreshToken, true);
+
         const credentials = await this.credential.save({
             user: user,
             password: hashed,
             otp: generatedotp,
             otpExpires_at: new Date(Date.now() + 10 * 60 * 1000), // OTP valid for 10 minutes
+            refresh_token: refreshToken,
+            refresh_token_expires_at: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // Refresh token valid for 15 days
         })
 
-        generateJWTTokenAndStore(user.id, user.email, user.role, res!);
+
+       
         const token = generateOtp();
 
         // Send OTP to the user via email
@@ -82,3 +92,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         }
     }
 }
+
+
+

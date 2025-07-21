@@ -5,7 +5,7 @@ import { Credentials, User } from "@/entities";
 import { In, Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { comparePassword } from "src/utils/hashedPassword";
-import { generateJWTTokenAndStore } from "src/utils/generateToken";
+import { generateJWTToken, storeTokenInCookie } from "src/utils/generateToken";
 
 @CommandHandler(LoginUserCommand)
 export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
@@ -41,7 +41,17 @@ export class LoginUserHandler implements ICommandHandler<LoginUserCommand>{
         }
 
           // Generate JWT token
-        const token = generateJWTTokenAndStore(user.id, user.email, user.role, res);
+        const accessToken = generateJWTToken(user.id, user.email, user.role, false);
+        const refreshToken = generateJWTToken(user.id, user.email, user.role, true);
+
+        // Set the access and refresh token in the response cookie
+        storeTokenInCookie(res!, accessToken, false);
+        storeTokenInCookie(res!, refreshToken, true);
+
+        credentials.refreshToken = refreshToken
+        credentials.refreshTokenExpiresAt = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000); // Refresh token valid for 15 days
+
+        await this.credential.save(credentials);
 
 
         // If the password is valid, return user details (excluding password)

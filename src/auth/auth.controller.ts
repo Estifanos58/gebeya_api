@@ -11,6 +11,7 @@ import { ForgotPasswordCommand } from './commands/forgot-password.command';
 import { ResetPasswordCommand } from './commands/reset-password.command';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GetUserQuery } from './queries/get-user-query';
+import { RefreshTokenCommand } from './commands/refresh-token.command';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -89,6 +90,13 @@ export class AuthController {
        const user= await this.commandBus.execute(new ResetPasswordCommand(token, email, body.newPassword, res));
        
         return res.status(200).json({...user});
+    }
+
+    @Get("/refresh-token")
+    async refreshToken(@Req() req: Request, @Res() res: Response){
+        const user = await this.commandBus.execute(new RefreshTokenCommand(req, res))
+
+        res.status(200).json({...user});
     }
 
     @Get("/me")
