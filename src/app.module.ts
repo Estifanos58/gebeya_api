@@ -19,6 +19,8 @@ import {
   Store
 } from './entities';
 import { EntityModule } from './entities/entity.module';
+import { ThrottlerModule,  ThrottlerGuard } from "@nestjs/throttler"
+import { APP_GUARD } from "@nestjs/core"
 
 @Module({
   imports: [
@@ -48,9 +50,23 @@ import { EntityModule } from './entities/entity.module';
     MailModule,
     StoreModule,
     EntityModule,
+    ThrottlerModule.forRoot([{
+      name: "short",
+      ttl: 1000,
+      limit: 3
+    },{
+      name: "long",
+      ttl: 60000,
+      limit: 20
+    }])
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, 
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class AppModule {}
 

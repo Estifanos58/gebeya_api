@@ -6,7 +6,7 @@
  - [x] Email verification via OTP
  - [x] Password reset via email + expiration
  - [x] Refresh token + Access token management
- - [] Rate-limiting on Login, OTP, reset
+ - [x] Rate-limiting on Login, OTP, reset
  - [] Session activity tracking (devices, IP)
  - [] User ban. disable by admin
 
