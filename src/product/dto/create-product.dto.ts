@@ -14,6 +14,9 @@ export class CreateProductDto{
      cover: string;
 
      @IsNotEmpty()
+     categoryId: string;
+
+     @IsNotEmpty()
      storeId: Store["id"];
 
      @IsArray()

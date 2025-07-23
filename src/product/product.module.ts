@@ -4,9 +4,10 @@ import { CreateProductHandler } from './handler/create-product.handler';
 import { AuthenticateMiddleware } from '@/middleware/authenticate.middleware';
 import { EntityModule } from '@/entities/entity.module';
 import { CqrsModule } from '@nestjs/cqrs';
+import { CreateCategoryHandler } from './handler/create-category.handler';
 
 
-const CommandHandlers = [CreateProductHandler]
+const CommandHandlers = [CreateProductHandler, CreateCategoryHandler];
 
 @Module({
   imports: [EntityModule, CqrsModule,],

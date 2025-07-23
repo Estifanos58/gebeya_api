@@ -14,7 +14,7 @@
   - [x] create a store
   - [] Store rating and Reviews
   - [] Inventory managenment(stoke, low stoke warning)
-  - [] Add Product to Store
+  - [x] Add Product to Store
   - [] Update Product In Store
   - [] Remove product from Store 
   - [] get store Data

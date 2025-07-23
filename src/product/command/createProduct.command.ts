@@ -14,6 +14,7 @@ export class CreateProductCommand {
         public readonly cover: string,
         public readonly userId: User['id'],
         public readonly storeId: Store['id'],
+        public readonly categoryId: string,
         public readonly productSkus: Array<Skus>
     ) {}
 }

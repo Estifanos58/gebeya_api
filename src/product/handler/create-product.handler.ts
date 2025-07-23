@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { CreateProductCommand } from "../command/createProduct.command";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Product, ProductSkus, Store } from "@/entities";
+import { Category, Product, ProductSkus, Store } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus, Logger } from "@nestjs/common";
 
@@ -17,17 +17,28 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
     private readonly productRepo: Repository<Product>,
 
     @InjectRepository(ProductSkus)
-    private readonly productSkusRepo: Repository<ProductSkus>
+    private readonly productSkusRepo: Repository<ProductSkus>,
+
+    @InjectRepository(Category)
+    private readonly categoryRepo: Repository<Category>,
   ) {}
 
   async execute(command: CreateProductCommand): Promise<any> {
-    const { name, description, cover, userId, storeId, productSkus } = command;
+    const { name, description, cover, userId, storeId, categoryId , productSkus } = command;
 
     try {
       const store = await this.storeRepo.findOne({
         where: { id: storeId, user: { id: userId } },
         relations: ['user'],
       });
+
+      const category = await this.categoryRepo.findOne({
+        where: { id: categoryId },
+      })
+
+      if (!category) {
+        throw new HttpException({ message: "Category not found" }, HttpStatus.NOT_FOUND);
+      }
 
       if (!store) {
         throw new HttpException({ message: "You are not allowed to add products to this store" }, HttpStatus.FORBIDDEN);
@@ -38,6 +49,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
         description,
         cover,
         store,
+        category
       });
 
       const savedProduct = await this.productRepo.save(product);
