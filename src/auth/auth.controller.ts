@@ -12,13 +12,14 @@ import { ResetPasswordCommand } from './commands/reset-password.command';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GetUserQuery } from './queries/get-user-query';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
+import { UserRole } from '@/entities';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
     export interface Request {
         user?: any;
         userId?: string; // Optional: if you want to attach userId as well
-        userRole?: string; // Optional: if you want to attach userRole
+        userRole?: UserRole; // Optional: if you want to attach userRole
     }
 }
 

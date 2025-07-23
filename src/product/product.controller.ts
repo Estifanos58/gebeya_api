@@ -12,7 +12,7 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 // import { UpdateProductDto } from './dto/update-product.dto';
 import { Request, Response } from 'express';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateProductCommand } from './command/createProduct.command';
 import { Roles } from '@/decorator/roles.decorator';
 import { UserRole } from '@/entities';
@@ -20,10 +20,16 @@ import { CreateCategoryDto } from './dto/createCategory.dto';
 import { CreateCategoryCommand } from './command/createCategory.command';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductCommand } from './command/updateProduct.command';
+import { GetStoreQuery } from './query/get-store.query';
+import { GetAllStoreQuery } from './query/get-all-stores.query';
+import { DeleteProductCommand } from './command/deleteProduct.command';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus
+  ) {}
 
   @Roles([UserRole.MERCHANT]) // Example roles, adjust as necessary
   @Post()
@@ -63,10 +69,17 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {}
+  async findAll(@Req() req: Request, @Res() res: Response ) {
+    const store =  await this.queryBus.execute(new GetAllStoreQuery());
+    return res.status(200).json({...store}); 
+  }
+
 
   @Get(':id')
-  findOne(@Param('id') id: string) {}
+  async findOne(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+      const store = await this.queryBus.execute(new GetStoreQuery(id))
+      return res.status(200).json({...store});
+  }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Req() req: Request, @Res() res: Response) {
@@ -85,5 +98,8 @@ export class ProductController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {}
+  async remove(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    const product = await this.commandBus.execute(new DeleteProductCommand(req.userId!, id));
+    return res.status(200).json({...product});
+  }
 }

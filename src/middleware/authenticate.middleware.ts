@@ -1,7 +1,7 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NextFunction, Request, Response } from "express";
-import { User } from "@/entities";
+import { User, UserRole } from "@/entities";
 import { verifyToken } from "src/utils/generateToken";
 import { Repository } from "typeorm";
 
@@ -50,6 +50,7 @@ export class AuthenticateMiddleware implements NestMiddleware{
 
             req.user = user; // Attach user to request object
             req.userId = user.id; // Attach userId to request object
+            req.userRole = user.role;
          // Attach user info to request object
             next();
         } catch (error) {

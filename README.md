@@ -15,9 +15,9 @@
   - [] Store rating and Reviews
   - [] Inventory managenment(stoke, low stoke warning)
   - [x] Add Product to Store
-  - [] Update Product In Store
-  - [] Remove product from Store 
-  - [] get store Data
+  - [x] Update Product In Store
+  - [x] Remove product from Store 
+  - [x] get store Data
   - [] get product detail 
   - [] Notify Store Owner When certain Product quantity reachs Low Point
   - [] Notify Store Owner When A Product is Purchased
