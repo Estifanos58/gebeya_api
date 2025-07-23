@@ -1,3 +1,4 @@
+import { Store, User } from "@/entities";
 import { Skus } from "./createProduct.command";
 
 export class UpdateProductCommand {
@@ -6,7 +7,8 @@ export class UpdateProductCommand {
         public readonly name: string,
         public readonly description: string,
         public readonly cover: string,
+        public readonly userId: User['id'],
         public readonly categoryId: string,
-        public readonly productSkus:Array<Skus>,
+        public readonly productSkus: Array<Skus&{id: string}>,
     ){}
 }

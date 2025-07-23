@@ -5,9 +5,10 @@ import { AuthenticateMiddleware } from '@/middleware/authenticate.middleware';
 import { EntityModule } from '@/entities/entity.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { CreateCategoryHandler } from './handler/create-category.handler';
+import { UpdateProductHandler } from './handler/update-product.handler';
 
 
-const CommandHandlers = [CreateProductHandler, CreateCategoryHandler];
+const CommandHandlers = [CreateProductHandler, CreateCategoryHandler, UpdateProductHandler];
 
 @Module({
   imports: [EntityModule, CqrsModule,],
