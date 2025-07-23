@@ -24,12 +24,15 @@ export class ProductSkus {
   @Column({ name: "size", type: "enum", enum: Size })
   size: Size;
 
-  @Column()
+  @Column({name: "price"})
   price: string;
 
-  @Column()
+  @Column({name: "quantity"})
   quantity: number;
 
-  @Column({ name: "prev_price" })
+  @Column({name: "color"})
+  color: string;
+
+  @Column({ name: "prev_price", nullable: true })
   prevPrice: number;
 }

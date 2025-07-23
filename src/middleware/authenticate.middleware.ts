@@ -49,6 +49,7 @@ export class AuthenticateMiddleware implements NestMiddleware{
             }
 
             req.user = user; // Attach user to request object
+            req.userId = user.id; // Attach userId to request object
          // Attach user info to request object
             next();
         } catch (error) {

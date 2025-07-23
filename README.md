@@ -11,7 +11,7 @@
  - [] User ban. disable by admin
 
 # store 
-  - [] create a store
+  - [x] create a store
   - [] Store rating and Reviews
   - [] Inventory managenment(stoke, low stoke warning)
   - [] Add Product to Store

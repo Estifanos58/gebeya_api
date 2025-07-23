@@ -16,11 +16,13 @@ import {
   Payment,
   OrderDetails,
   Credentials,
-  Store
+  Store,
+  Comment
 } from './entities';
 import { EntityModule } from './entities/entity.module';
 import { ThrottlerModule,  ThrottlerGuard } from "@nestjs/throttler"
 import { APP_GUARD } from "@nestjs/core"
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -41,7 +43,8 @@ import { APP_GUARD } from "@nestjs/core"
         ProductSkus,
         Category,
         Credentials,
-        Store
+        Store,
+        Comment
       ], // This is imported for the synchrozation
       synchronize: true,
     }),
@@ -58,7 +61,8 @@ import { APP_GUARD } from "@nestjs/core"
       name: "long",
       ttl: 60000,
       limit: 20
-    }])
+    }]),
+    ProductModule
   ],
   controllers: [AppController],
   providers: [AppService, 
