@@ -13,7 +13,7 @@ export class DeleteStoreHandler implements ICommandHandler<DeleteStoreCommand>{
     async execute(command: DeleteStoreCommand): Promise<any> {
         const { user, id } =  command;
 
-        const store = await this.storeRepo.findOne({where: {id, user}})
+        const store = await this.storeRepo.findOne({where: {id, user}, relations: ["user"]});
 
         if(!store){
             throw new HttpException({ message: "You are not Authorized"}, HttpStatus.UNAUTHORIZED)

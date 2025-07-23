@@ -10,7 +10,8 @@ import {
   Payment,
   OrderDetails,
   Credentials,
-  Store
+  Store,
+  Comment
 
 } from './index';
 
@@ -26,7 +27,8 @@ import {
       Payment,
       OrderDetails,
       Credentials,
-      Store
+      Store,
+      Comment
     ]),
   ],
   exports:[TypeOrmModule]

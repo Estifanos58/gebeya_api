@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Product } from "./product";
 
@@ -10,7 +10,8 @@ export class Store {
     @Column({name: "name"})
     name: string;
 
-    @OneToOne(()=> User, {cascade: true})
+    @OneToOne(()=> User)
+    @JoinColumn({name: "user_id"})
     user: User
 
     @OneToMany(()=> Product, (product)=> product.store )
@@ -25,6 +26,6 @@ export class Store {
     @Column({name: "is_verified", type: "boolean" ,default: false})
     isVerified: boolean;
 
-    @Column({name: "created_at", type: "date" })
+    @Column({name: "created_at", type: "timestamp" , default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date
 }

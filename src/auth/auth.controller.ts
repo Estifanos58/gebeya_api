@@ -17,6 +17,8 @@ import { RefreshTokenCommand } from './commands/refresh-token.command';
 declare module 'express' {
     export interface Request {
         user?: any;
+        userId?: string; // Optional: if you want to attach userId as well
+        userRole?: string; // Optional: if you want to attach userRole
     }
 }
 

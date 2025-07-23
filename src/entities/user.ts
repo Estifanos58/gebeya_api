@@ -1,6 +1,8 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Cart } from "./cart";
 import { Credentials } from "./credentials";
+import { Comment } from "./comment";
+import { Store } from "./store";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -53,5 +55,12 @@ export class User {
   @OneToOne(() => Credentials, (credentials) => credentials.user, {onDelete: "CASCADE", cascade: true})
   @JoinColumn({ name: "credentials_id" })
   credentials: Credentials;
+
+  @OneToMany(()=> Comment, (comment)=> comment.user)
+  comment: Comment[];
+
+  @OneToOne(()=>Store , (store)=> store.user, {cascade: true})
+  @JoinColumn({ name: "store_id" })
+  store: Store;
 }
 
