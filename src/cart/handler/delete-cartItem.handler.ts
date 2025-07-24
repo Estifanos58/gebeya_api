@@ -1,10 +1,12 @@
-import { ICommandHandler } from "@nestjs/cqrs";
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { DeleteCartItemCommand } from "../command/delete-cartItem.command";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CartItem } from "@/entities";
 import { Repository } from "typeorm";
 import { NotFoundException } from "@nestjs/common";
 
+
+@CommandHandler(DeleteCartItemCommand)
 export class DeleteCartItemHandler implements ICommandHandler<DeleteCartItemCommand> {
     constructor(
         @InjectRepository(CartItem)
