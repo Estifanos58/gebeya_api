@@ -19,6 +19,8 @@ import { GetAllStoreQuery } from './query/get-all-stores.query';
 import { GetStoreQuery } from './query/get-store.query';
 import { CreateCategoryDto } from './dto/createCategory.dto';
 import { CreateCategoryCommand } from './command/createCategory.command';
+import { createCommentDto } from './dto/createComment.dto';
+import { CreateCommentCommand } from './command/createComment.command';
 
 @Controller('store')
 @Roles([UserRole.MERCHANT, UserRole.ADMIN]) // Example roles, adjust as necessary
@@ -73,6 +75,18 @@ export class StoreController {
     );
 
     return res.status(200).json({ ...store });
+  }
+
+  @Post("comment/:id")
+  async createComment (
+    @Param("id") id: string,
+    @Body() createComment: createCommentDto,
+    @Req() req: Request,
+    @Res() res: Response
+  ){
+    const comment = await this.commandBus.execute(new CreateCommentCommand(req.userId! , id , createComment.comment, createComment.review ));
+
+    return res.status(201).json({...comment});
   }
 
   @Roles([UserRole.MERCHANT])
