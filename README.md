@@ -23,7 +23,7 @@
   - [] Notify Store Owner When A Product is Purchased
 
 # Cart System
-  - [] Add/ update / remove items from Cart
+  - [x] Add/ update / remove items from Cart
   - [] Sync Cart When User Logs In
   - [] Cart expires after X days
   - [] Save for Later/ WishList
