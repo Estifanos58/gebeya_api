@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn,  ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Product } from "./product";
+import { Store } from "./store";
 
 
 
@@ -19,6 +20,10 @@ export class Comment {
     @ManyToOne(()=> Product, (product)=>product.comment)
     @JoinColumn({name: "product_id"})
     product: Product
+
+    @ManyToOne(()=> Store, (store)=>store.comment)
+    @JoinColumn({name: "store_id"})
+    store: Store
 
     @Column({name: "review",type: "int", nullable: true})
     review: number

@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Product } from "./product";
+import { Comment } from "./comment";
 
 @Entity({name: "store"})
 export class Store {
@@ -16,6 +17,9 @@ export class Store {
 
     @OneToMany(()=> Product, (product)=> product.store )
     product: Product[]
+
+    @OneToMany(()=> Comment, (comment)=> comment.store)
+    comment: Comment[]
 
     @Column({name: "location"})
     location: string

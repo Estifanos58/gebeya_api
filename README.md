@@ -12,13 +12,13 @@
 
 # store 
   - [x] create a store
-  - [] Store rating and Reviews
+  - [x] Store rating and Reviews
   - [] Inventory managenment(stoke, low stoke warning)
   - [x] Add Product to Store
   - [x] Update Product In Store
   - [x] Remove product from Store 
   - [x] get store Data
-  - [] get product detail 
+  - [x] get product detail 
   - [] Notify Store Owner When certain Product quantity reachs Low Point
   - [] Notify Store Owner When A Product is Purchased
 
