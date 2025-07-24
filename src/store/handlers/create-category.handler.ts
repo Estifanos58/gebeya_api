@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateCategoryCommand } from "../command/createCategory.command";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Category } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import { CreateCategoryCommand } from "../command/createCategory.command";
 
 @CommandHandler(CreateCategoryCommand)
 export class CreateCategoryHandler implements ICommandHandler<CreateCategoryCommand> {

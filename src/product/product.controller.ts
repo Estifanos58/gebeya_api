@@ -10,18 +10,13 @@ import {
   Res,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
-// import { UpdateProductDto } from './dto/update-product.dto';
 import { Request, Response } from 'express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateProductCommand } from './command/createProduct.command';
 import { Roles } from '@/decorator/roles.decorator';
 import { UserRole } from '@/entities';
-import { CreateCategoryDto } from './dto/createCategory.dto';
-import { CreateCategoryCommand } from './command/createCategory.command';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductCommand } from './command/updateProduct.command';
-import { GetStoreQuery } from './query/get-store.query';
-import { GetAllStoreQuery } from './query/get-all-stores.query';
 import { DeleteProductCommand } from './command/deleteProduct.command';
 
 @Controller('product')
@@ -50,35 +45,6 @@ export class ProductController {
       ),
     );
     return res.status(201).json(product);
-  }
-
-  @Roles([UserRole.MERCHANT])
-  @Post('category')
-  async createCategory(
-    @Body() createCategoryDto: CreateCategoryDto,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    const category = await this.commandBus.execute(
-      new CreateCategoryCommand(
-        createCategoryDto.name,
-        createCategoryDto.description,
-      ),
-    );
-    return res.status(201).json(category);
-  }
-
-  @Get()
-  async findAll(@Req() req: Request, @Res() res: Response ) {
-    const store =  await this.queryBus.execute(new GetAllStoreQuery());
-    return res.status(200).json({...store}); 
-  }
-
-
-  @Get(':id')
-  async findOne(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
-      const store = await this.queryBus.execute(new GetStoreQuery(id))
-      return res.status(200).json({...store});
   }
 
   @Patch(':id')
