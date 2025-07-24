@@ -18,6 +18,7 @@ import { UserRole } from '@/entities';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductCommand } from './command/updateProduct.command';
 import { DeleteProductCommand } from './command/deleteProduct.command';
+import { FindProductQuery } from './query/find-product.query';
 
 @Controller('product')
 export class ProductController {
@@ -61,6 +62,12 @@ export class ProductController {
       ),
     );
     return res.status(200).json({...updatedProduct});
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
+    const product = await this.queryBus.execute(new FindProductQuery(id));
+    return res.status(200).json(product);
   }
 
   @Delete(':id')
