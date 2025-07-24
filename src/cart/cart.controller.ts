@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Patch, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from "@nestjs/common";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { CreateCartDto } from "./dto/create-cart.dto";
 import { Request, Response } from "express";
@@ -7,6 +7,7 @@ import { CreateCartCommand } from "./command/create-cart.command";
 import { updateCartCommand } from "./command/update-cart.command";
 import { DeleteCartCommand } from "./command/delete-cart.command";
 import { DeleteCartItemCommand } from "./command/delete-cartItem.command";
+import { GetCartQuery } from "./query/get-cart.query";
 
 @Controller("cart")
 export class CartController {
@@ -14,6 +15,12 @@ export class CartController {
         private readonly commandBus: CommandBus,
         private readonly queryBus: QueryBus
     ){}
+
+    @Get()
+    async getCart(@Req() req: Request, @Res() res: Response): Promise<any> {
+        const cart = await this.queryBus.execute(new GetCartQuery(req.userId!));
+        return res.status(200).json({...cart});
+    }
 
     @Post('add')
     async createCart(@Body() createCartdto: CreateCartDto, @Req() req: Request,  @Res() res: Response): Promise<any> {

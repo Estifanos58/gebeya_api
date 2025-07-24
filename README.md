@@ -24,9 +24,9 @@
 
 # Cart System
   - [x] Add/ update / remove items from Cart
-  - [] Sync Cart When User Logs In
+  - [x] Sync Cart When User Logs In
   - [] Cart expires after X days
-  - [] Save for Later/ WishList
+  - [x] Save for Later
 
 # Order System
   - [] Order status (pending, shipped, delivered, cancelled)
