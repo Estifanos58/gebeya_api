@@ -5,14 +5,16 @@ import { AuthenticateMiddleware } from '@/middleware/authenticate.middleware';
 import { EntityModule } from '@/entities/entity.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateProductHandler } from './handler/update-product.handler';
+import { FindProductHandler } from './handler/find-product.handler';
 
 
 const CommandHandlers = [CreateProductHandler, UpdateProductHandler];
+const QueryHandlers = [FindProductHandler];
 
 @Module({
   imports: [EntityModule, CqrsModule,],
   controllers: [ProductController],
-  providers: [...CommandHandlers],
+  providers: [...CommandHandlers, ...QueryHandlers],
 })
 export class ProductModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
