@@ -36,9 +36,9 @@
 
 # Product Reviews and Ratings
   - [] Review system(1-5 stars + comments)
-  - [] Full-text search by name, tag, category
-  - [] Price range filtering
-  - [] Sort by price, populating, rating
+  - [x] Full-text search by name,  category
+  - [x] Price range filtering
+  - [x] Sort by price, populating, rating
   - [] Related/ recommended products
   - [] Search analytitcs/ logging
 

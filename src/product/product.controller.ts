@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   Res,
+  Query,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Request, Response } from 'express';
@@ -19,6 +20,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductCommand } from './command/updateProduct.command';
 import { DeleteProductCommand } from './command/deleteProduct.command';
 import { FindProductQuery } from './query/find-product.query';
+import { GetPoductsQuery } from './query/get-products.query';
 
 @Controller('product')
 export class ProductController {
@@ -26,6 +28,24 @@ export class ProductController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus
   ) {}
+
+  @Get()
+  async findAll(@Query() query: any, @Req() req: Request, @Res() res: Response) {
+    const products = await this.queryBus.execute(
+      new GetPoductsQuery(
+        query.categoryId,
+        query.sortBy,
+        query.sortOrder,
+        query.page,
+        query.limit,
+        query.name,
+        query.minRange,
+        query.maxRange
+      )
+    );
+    return res.status(200).json(products);
+
+  }
 
   @Roles([UserRole.MERCHANT]) // Example roles, adjust as necessary
   @Post()
