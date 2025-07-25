@@ -1,19 +1,19 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetPoductsQuery, ProductSortBy } from '../query/get-products.query';
+import { GetProductsQuery, ProductSortBy } from '../query/get-products.query';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment, Product } from '@/entities';
 import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 
-@QueryHandler(GetPoductsQuery)
-export class GetProductsHandler implements IQueryHandler<GetPoductsQuery> {
+@QueryHandler(GetProductsQuery)
+export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
   ) {}
 
-  async execute(query: GetPoductsQuery): Promise<any> {
+  async execute(query: GetProductsQuery): Promise<any> {
     const {
       categoryId,
       sortBy,
@@ -103,8 +103,8 @@ export class GetProductsHandler implements IQueryHandler<GetPoductsQuery> {
         pagination: {
           totalCount,
           page,
-          limit,
-          totalPages: Math.ceil(totalCount / limit),
+          pageSize,
+          totalPages: Math.ceil(totalCount / pageSize),
         },
       };
     } catch (error) {

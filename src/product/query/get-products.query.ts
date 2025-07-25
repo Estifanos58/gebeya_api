@@ -7,7 +7,7 @@ export enum ProductSortBy {
 }
 
 
-export class GetPoductsQuery {
+export class GetProductsQuery {
   constructor(
     public readonly categoryId: string,
     public readonly sortBy: ProductSortBy = ProductSortBy.CREATED_AT,
