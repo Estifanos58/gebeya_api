@@ -6,10 +6,11 @@ import { EntityModule } from '@/entities/entity.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateProductHandler } from './handler/update-product.handler';
 import { FindProductHandler } from './handler/find-product.handler';
+import { GetProductsHandler } from './handler/get-products.handler';
 
 
 const CommandHandlers = [CreateProductHandler, UpdateProductHandler];
-const QueryHandlers = [FindProductHandler];
+const QueryHandlers = [FindProductHandler, GetProductsHandler];
 
 @Module({
   imports: [EntityModule, CqrsModule,],
