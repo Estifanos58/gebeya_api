@@ -7,9 +7,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { OrderItem } from '@/entities/oder_item';
+import { OrderItem } from '@/entities/order_item';
 import { Order } from '@/entities/order';
 import { calculateCartTotal } from '@/utils/generalFunctions';
+import { randomUUID } from 'crypto';
 
 export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   constructor(
@@ -24,11 +25,18 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<any> {
-    const { userId, cartId } = command;
+    const { user, cartId, deliveryAddress, contactInfo } = command;
+
+    let orderDeliveryAddress = deliveryAddress ?? user?.address;
+    let orderContactInfo = contactInfo ?? user?.phoneNumber;
+
+    if(!orderDeliveryAddress || !orderContactInfo) {
+      throw new InternalServerErrorException('Delivery address and contact info are required')
+    }
 
     try {
       const cart = await this.cartRepo.findOne({
-        where: { id: cartId, user: { id: userId } },
+        where: { id: cartId, user: user },
         relations: ['cartItems', 'cartItems.productSku', 'user'],
       });
 
@@ -40,7 +48,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       const totalPrice = calculateCartTotal(cart.cartItems);
 
       let orderItems: OrderItem[] = [];
-      
+
       for (const item of cart.cartItems) {
         const orderItem = this.orderItemRepo.create({
           productSkus: item.productSku,
@@ -52,9 +60,12 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       }
 
       const order = this.orderRepo.create({
-        user: { id: userId },
+        user: user,
         total: totalPrice,
         items: orderItems,
+        orderNumber: `ORD-${randomUUID()}`,
+        deliveryAddress: orderDeliveryAddress,
+        contactInfo: orderContactInfo,
       });
 
       await Promise.all([

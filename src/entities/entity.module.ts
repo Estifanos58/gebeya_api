@@ -8,10 +8,11 @@ import {
   ProductSkus,
   User,
   Payment,
-  OrderDetails,
   Credentials,
   Store,
-  Comment
+  Comment,
+  Order,
+  OrderItem
 
 } from './index';
 
@@ -25,10 +26,11 @@ import {
       ProductSkus,
       User,
       Payment,
-      OrderDetails,
       Credentials,
       Store,
-      Comment
+      Comment,
+      Order,
+      OrderItem
     ]),
   ],
   exports:[TypeOrmModule]

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn } from 'typeorm';
 import { User } from './user';
-import { OrderItem } from './oder_item';
+import { OrderItem } from './order_item';
 
 export enum OrderStatus{
     PLACED = 'placed',
@@ -23,6 +23,18 @@ export class Order {
 
   @Column('decimal', {name: 'order_total_price'})
   total: number;
+
+  @Column({ name: 'order_number', unique: true })
+  orderNumber: string;
+
+  @Column({ name: 'delivery_address', nullable: true })
+  deliveryAddress: string;
+
+  @Column({ name: 'contact_info', nullable: true })
+  contactInfo: string;
+
+  @Column({ name: 'is_paid', default: false })
+  isPaid: boolean;
 
   @CreateDateColumn()
   createdAt: Date;
