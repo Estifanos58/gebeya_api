@@ -28,8 +28,4 @@ const QueryHandler = [GetAllStoreHandler, GetStoreHandler];
 
 })
 
-export class StoreModule implements NestModule{
-    configure(consumer: MiddlewareConsumer) {
-        consumer.apply(AuthenticateMiddleware).exclude().forRoutes('store/*path')
-    }
-}
+export class StoreModule{}

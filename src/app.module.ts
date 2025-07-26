@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -14,7 +14,8 @@ import {
   ProductSkus,
   Category,
   Payment,
-  OrderDetails,
+  Order,
+  OrderItem,
   Credentials,
   Store,
   Comment
@@ -23,6 +24,9 @@ import { EntityModule } from './entities/entity.module';
 import { ThrottlerModule,  ThrottlerGuard } from "@nestjs/throttler"
 import { APP_GUARD } from "@nestjs/core"
 import { ProductModule } from './product/product.module';
+import { OrderModule } from './order/order.module';
+import { CartModule } from './cart/cart.module';
+import { AuthenticateMiddleware } from './middleware/authenticate.middleware';
 
 @Module({
   imports: [
@@ -37,7 +41,8 @@ import { ProductModule } from './product/product.module';
         User,
         CartItem,
         Cart,
-        OrderDetails,
+        Order,
+        OrderItem,
         Payment,
         Product,
         ProductSkus,
@@ -48,11 +53,14 @@ import { ProductModule } from './product/product.module';
       ], // This is imported for the synchrozation
       synchronize: true,
     }),
-    AuthModule,
     ConfigModule.forRoot(),
+    AuthModule,
     MailModule,
     StoreModule,
     EntityModule,
+    OrderModule,
+    CartModule,
+    ProductModule,
     ThrottlerModule.forRoot([{
       name: "short",
       ttl: 1000,
@@ -62,7 +70,6 @@ import { ProductModule } from './product/product.module';
       ttl: 60000,
       limit: 20
     }]),
-    ProductModule
   ],
   controllers: [AppController],
   providers: [AppService, 
@@ -72,7 +79,11 @@ import { ProductModule } from './product/product.module';
     }
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+    configure(consumer: MiddlewareConsumer) {
+      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup', 'auth/forgot-password').forRoutes('auth/*path')
+  }
+}
 
 
 

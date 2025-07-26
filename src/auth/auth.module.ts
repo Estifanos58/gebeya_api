@@ -26,8 +26,4 @@ const QueryHandlers = [GetUserHandler];
   controllers: [AuthController],
   providers: [...CommandHandlers, ...QueryHandlers],
 })
-export class AuthModule implements NestModule{
-  configure(consumer: MiddlewareConsumer) {
-      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup', 'auth/forgot-password').forRoutes('auth/*path')
-  }
-}
+export class AuthModule{}

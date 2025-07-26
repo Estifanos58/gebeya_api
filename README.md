@@ -29,9 +29,9 @@
   - [x] Save for Later
 
 # Order System
-  - [] Order status (pending, shipped, delivered, cancelled)
-  - [] Automatic order number generator
-  - [] Delivery address + contact info on Order
+  - [x] Order status (pending, shipped, delivered, cancelled)
+  - [x] Automatic order number generator
+  - [x] Delivery address + contact info on Order
   - [] Merchant see All Orders
 
 # Product Reviews and Ratings
