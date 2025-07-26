@@ -25,7 +25,7 @@ export class ProductSkus {
   size: Size;
 
   @Column({name: "price"})
-  price: string;
+  price: number;
 
   @Column({name: "quantity"})
   quantity: number;
@@ -34,5 +34,5 @@ export class ProductSkus {
   color: string;
 
   @Column({ name: "prev_price", nullable: true })
-  prevPrice: string;
+  prevPrice: number;
 }

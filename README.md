@@ -13,19 +13,19 @@
 # store 
   - [x] create a store
   - [x] Store rating and Reviews
-  - [] Inventory managenment(stoke, low stoke warning)
+  - [] Inventory managenment(stoke, low stoke warning) ***
   - [x] Add Product to Store
   - [x] Update Product In Store
   - [x] Remove product from Store 
   - [x] get store Data
   - [x] get product detail 
-  - [] Notify Store Owner When certain Product quantity reachs Low Point
+  - [] Notify Store Owner When certain Product quantity reachs Low Point ***
   - [] Notify Store Owner When A Product is Purchased
 
 # Cart System
   - [x] Add/ update / remove items from Cart
   - [x] Sync Cart When User Logs In
-  - [] Cart expires after X days
+  - [] Cart expires after X days  ***
   - [x] Save for Later
 
 # Order System
