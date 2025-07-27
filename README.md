@@ -51,11 +51,11 @@
   - [] Export CSV report
 
 # Payment System 💳 (NEW)
-  - [] Integrate with payment gateway (e.g., Stripe, Chapa, Flutterwave)
-  - [] Generate payment session URL (redirect / inline)
-  - [] Payment webhook listener (success, failure, timeout)
-  - [] Mark order as paid on successful payment
-  - [] Save transaction metadata (payment ID, gateway, status)
+  - [x] Integrate with payment gateway (e.g., Stripe, Chapa, Flutterwave)
+  - [x] Generate payment session URL (redirect / inline)
+  - [x] Payment webhook listener (success, failure, timeout)
+  - [x] Mark order as paid on successful payment
+  - [x] Save transaction metadata (payment ID, gateway, status)
   - [] User payment history endpoint
   - [] Merchant payout tracking
   - [] Admin view all transactions

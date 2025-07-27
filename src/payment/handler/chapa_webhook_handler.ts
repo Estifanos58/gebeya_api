@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order, Payment, PaymentStatus } from '@/entities';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { SuccessfulPaymentEvent } from '../event/successful_payment.event';
 
 @CommandHandler(ChapaWebhookCommand)
 export class ChapaWebhookHandler
@@ -14,7 +16,9 @@ export class ChapaWebhookHandler
     private readonly paymentRepo: Repository<Payment>,
 
     @InjectRepository(Order)
-    private readonly orderRepository: Repository<Order>
+    private readonly orderRepository: Repository<Order>,
+
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(command: ChapaWebhookCommand): Promise<any> {
@@ -42,6 +46,16 @@ export class ChapaWebhookHandler
       );
 
       // 2. Emit event (if using domain events later)
+      this.eventEmitter.emit(
+        'payment.success',
+        new SuccessfulPaymentEvent(
+          payment.id,
+          payment.amount,
+          payment.currency,
+          payment.user.id,
+          payment.createdAt
+        ),
+      );
 
       // 3. Optionally notify merchant or admin
     }

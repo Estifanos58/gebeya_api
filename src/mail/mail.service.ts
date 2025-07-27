@@ -20,7 +20,7 @@ export class MailService {
         return transporter;
     }
 
-    async sendOtp(mail: SendMailType): Promise<void> {
+    async sendMail(mail: SendMailType): Promise<void> {
         const { to, html, placeholders, subject } = mail;
         const transformHtml = substitutePlaceholders(html!, placeholders!);
         try {
@@ -33,7 +33,7 @@ export class MailService {
             }
 
             await transporter.sendMail(options);
-            console.log(`OTP sent to ${to}`);
+            // console.log(`OTP sent to ${to}`);
         } catch (error) {
             console.error(`Failed to send OTP to :`, error);
             throw new Error('Failed to send OTP');
