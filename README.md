@@ -50,7 +50,26 @@
   - [] View transactions and payment Status
   - [] Export CSV report
 
+# Payment System 💳 (NEW)
+  - [] Integrate with payment gateway (e.g., Stripe, Chapa, Flutterwave)
+  - [] Generate payment session URL (redirect / inline)
+  - [] Payment webhook listener (success, failure, timeout)
+  - [] Mark order as paid on successful payment
+  - [] Save transaction metadata (payment ID, gateway, status)
+  - [] User payment history endpoint
+  - [] Merchant payout tracking
+  - [] Admin view all transactions
+  - [] Support refund logic
+  - [] Support internal wallet/credit balance (optional)
+  - [] OTP-confirmed high-value transactions (optional)
 
+⚙️ Future: Automation, Cron, Events, Queues
+  - [] Cron job to clean expired carts
+  - [] Event-based notification system
+  - [] Background queue to process emails
+  - [] Low-stock product alert via queue
+  - [] Retry failed payments automatically
+  - [] Reward system using scheduled tasks
 <!-- # Customer
   [] register
   [] search store

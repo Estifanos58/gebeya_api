@@ -30,6 +30,10 @@ export class Store {
     @Column({name: "is_verified", type: "boolean" ,default: false})
     isVerified: boolean;
 
+    @Column({ name: 'chapa_api_key', nullable: true })
+    chapaApiKey: string; // Encrypted string
+
+
     @Column({name: "created_at", type: "timestamp" , default: () => "CURRENT_TIMESTAMP" })
     createdAt: Date
 }
