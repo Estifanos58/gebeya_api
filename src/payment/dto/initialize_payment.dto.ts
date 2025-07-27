@@ -1,5 +1,5 @@
 import { Order, Store } from "@/entities";
-import { IsOptional, IsString, IsUUID } from "class-validator";
+import { IsOptional, IsPositive, IsString, IsUUID } from "class-validator";
 
 export class InitializePaymentDto {
     @IsOptional()
@@ -18,7 +18,7 @@ export class InitializePaymentDto {
     @IsString()
     currency: string;
 
-
+    @IsPositive()
     amount: number;
 
     @IsUUID()

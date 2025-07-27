@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ChapaInitializePaymentCommand } from '../command/chapa_initialize_commannd';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Payment, PaymentGateway, PaymentStatus, Store } from '@/entities';
@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { generateReference } from '@/utils/generalFunctions';
 import { HttpService } from '@nestjs/axios';
 
+
+@CommandHandler(ChapaInitializePaymentCommand)
 export class ChapaInitializePaymentHandler
   implements ICommandHandler<ChapaInitializePaymentCommand>
 {
@@ -55,7 +57,7 @@ export class ChapaInitializePaymentHandler
     const payload = {
       tx_ref: reference,
       amount: amount,
-      currency: 'ETB',
+      currency: currency ?? 'ETB',
       first_name: first_name ?? user.firstName,
       last_name: last_name ?? user.lastName,
       email: email ?? user.email,

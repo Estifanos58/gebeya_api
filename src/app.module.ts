@@ -27,6 +27,7 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { CartModule } from './cart/cart.module';
 import { AuthenticateMiddleware } from './middleware/authenticate.middleware';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { AuthenticateMiddleware } from './middleware/authenticate.middleware';
     OrderModule,
     CartModule,
     ProductModule,
+    PaymentModule,
     ThrottlerModule.forRoot([{
       name: "short",
       ttl: 1000,

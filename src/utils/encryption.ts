@@ -2,9 +2,9 @@ import * as crypto from 'crypto';
 
 const algorithm = 'aes-256-cbc';
 const secretKey = process.env.CHAPA_ENCRYPTION_KEY!; // 32 chars
-const iv = crypto.randomBytes(16);
 
 function encrypt(text: string): string {
+  const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey), iv);
   const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
   return iv.toString('hex') + ':' + encrypted.toString('hex');
