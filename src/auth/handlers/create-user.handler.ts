@@ -76,7 +76,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
                 year: new Date().getFullYear().toString(),
             } 
         }
-        await this.mailService.sendOtp(mail)
+        await this.mailService.sendMail(mail)
 
         
         // Exclude password from the response

@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Order } from "./order";
+import { Store } from "./store";
 
 export enum PaymentStatus {
     PENDING="pending",
@@ -17,7 +18,7 @@ export enum PaymentGateway {
 
 @Entity({ name: "payment" })
 export class Payment {
-    @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -43,6 +44,15 @@ export class Payment {
 
   @Column({nullable: true})
   paymentUrl: string;
+
+  @Column({ name: "currency", default: 'ETB' })
+  currency: string; // Default to 'ETB' (Ethiopian Birr)
+
+  @OneToOne(() => Order, order => order.payment, { nullable: true })
+  order: Order;
+
+  @ManyToOne(()=> Store, store => store.payments, { nullable: true })
+  store: Store;
 
   @CreateDateColumn()
   createdAt: Date;

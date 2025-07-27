@@ -28,6 +28,7 @@ import { OrderModule } from './order/order.module';
 import { CartModule } from './cart/cart.module';
 import { AuthenticateMiddleware } from './middleware/authenticate.middleware';
 import { PaymentModule } from './payment/payment.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { PaymentModule } from './payment/payment.module';
       synchronize: true,
     }),
     ConfigModule.forRoot(),
+    EventEmitterModule.forRoot(),
     AuthModule,
     MailModule,
     StoreModule,

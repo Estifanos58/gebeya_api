@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn
 import { User } from "./user";
 import { Product } from "./product";
 import { Comment } from "./comment";
+import { Payment } from "./payment";
 
 @Entity({name: "store"})
 export class Store {
@@ -32,6 +33,9 @@ export class Store {
 
     @Column({ name: 'chapa_api_key', nullable: true })
     chapaApiKey: string; // Encrypted string
+
+    @OneToMany(()=> Payment, payment => payment.store, { nullable: true })
+    payments: Payment[];
 
 
     @Column({name: "created_at", type: "timestamp" , default: () => "CURRENT_TIMESTAMP" })

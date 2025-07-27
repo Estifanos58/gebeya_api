@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, OneToOne } from 'typeorm';
 import { User } from './user';
 import { OrderItem } from './order_item';
+import { Payment } from './payment';
 
 export enum OrderStatus{
     PLACED = 'placed',
@@ -35,6 +36,9 @@ export class Order {
 
   @Column({ name: 'is_paid', default: false })
   isPaid: boolean;
+
+  @OneToOne(() => Payment, payment => payment.order, { nullable: true })
+  payment: Payment;
 
   @CreateDateColumn()
   createdAt: Date;
