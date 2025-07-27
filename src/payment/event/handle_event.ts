@@ -5,7 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Payment, User } from "@/entities";
 import { Repository } from "typeorm";
 import { MailService } from "@/mail/mail.service";
-import { ORDER_PLACED_TEMPLATE, PAYMENT_SUCCEFUL_TEMPLATE } from "@/utils/templates";
+import { ORDER_PLACED_TEMPLATE, PAYMENT_SUCCESSFUL_TEMPLATE } from "@/utils/templates";
 
 @Injectable()
 export class HandlePaymentEvent {
@@ -20,7 +20,7 @@ export class HandlePaymentEvent {
         private readonly mailService: MailService
     ){}
 
- @OnEvent('payment.successful')
+ @OnEvent('payment.success')
  async handleSuccessfulPaymentEvent(event: SuccessfulPaymentEvent) {
    const { paymentId, amount, currency, userId, timestamp } = event;
 
@@ -53,7 +53,7 @@ export class HandlePaymentEvent {
         </div>`
    )) 
 
-   let totlaPrice = paymentDetails?.order?.total;
+   let totalPrice = paymentDetails?.order?.total;
 
    const storeOwner = await this.userRepository.findOne({
     where: {id: paymentDetails.store.user.id},
@@ -75,7 +75,7 @@ export class HandlePaymentEvent {
         orderNumber: paymentDetails.order.orderNumber,
         deliveryAddress: paymentDetails.order.deliveryAddress,
         purchasedProductsHTMLT_Template: purchasedProductsHTMLT_Template.join(''),
-        totalPrice: totlaPrice,
+        totalPrice: totalPrice,
         year: new Date().getFullYear().toString(),
     }
    }
@@ -93,14 +93,14 @@ export class HandlePaymentEvent {
     const customerMail = {
         to: customer.email,
         subject: 'Payment Successful',
-        html: PAYMENT_SUCCEFUL_TEMPLATE,
+        html: PAYMENT_SUCCESSFUL_TEMPLATE,
         placeholders: {
             customerName: customer.firstName,
             storeName: paymentDetails.store.name,
             orderNumber: paymentDetails.order.orderNumber,
             deliveryAddress: paymentDetails.order.deliveryAddress,
             purchasedProductsHTMLT_Template: purchasedProductsHTMLT_Template.join(''),
-            totalPrice: totlaPrice,
+            totalPrice: totalPrice,
             year: new Date().getFullYear().toString(),
         }
     }

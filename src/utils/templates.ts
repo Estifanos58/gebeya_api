@@ -219,7 +219,7 @@ export const PASSWROD_RESET_SUCCESS_TEMPLATE = `
 </html>
 `
 
-export const PAYMENT_SUCCEFUL_TEMPLATE = 
+export const PAYMENT_SUCCESSFUL_TEMPLATE = 
 `
 <!DOCTYPE html>
 <html lang="en">
