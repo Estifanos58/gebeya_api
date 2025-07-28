@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { SuccessfulPaymentEvent } from "./successful_payment.event";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Payment, User } from "@/entities";
+import { Payment, ProductSkus, Size, User } from "@/entities";
 import { Repository } from "typeorm";
 import { MailService } from "@/mail/mail.service";
 import { ORDER_PLACED_TEMPLATE, PAYMENT_SUCCESSFUL_TEMPLATE } from "@/utils/templates";
@@ -16,6 +16,9 @@ export class HandlePaymentEvent {
 
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+
+        @InjectRepository(ProductSkus)
+        private readonly productSkusRepository: Repository<ProductSkus>,
 
         private readonly mailService: MailService
     ){}
@@ -34,6 +37,7 @@ export class HandlePaymentEvent {
     }
 
    const purchasedProducts = paymentDetails?.order?.items.map(item => ({
+     productSkusId: item.productSkus.id,
      productName: item.productSkus.product.name,
      color: item.productSkus.color,
      size: item.productSkus.size,
@@ -108,6 +112,13 @@ export class HandlePaymentEvent {
     await this.mailService.sendMail(customerMail);
 
     // Here remove the products from the store inventory
+
+    for(const item of purchasedProducts){
+      const product = await this.productSkusRepository.findOne({where: {id: item.productSkusId}})
+      if(product) await this.productSkusRepository.remove(product!)
+      else console.log(`Product not found with this ${item.productSkusId}`)
+    }
+    
     // Future improvements remove the error handling and add logging them to a separate db for the admin to review
 
 

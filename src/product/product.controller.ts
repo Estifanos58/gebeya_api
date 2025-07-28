@@ -20,7 +20,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { UpdateProductCommand } from './command/updateProduct.command';
 import { DeleteProductCommand } from './command/deleteProduct.command';
 import { FindProductQuery } from './query/find-product.query';
-import { GetPoductsQuery } from './query/get-products.query';
+import { GetProductsQuery } from './query/get-products.query';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { CreateReviewCommand } from './command/createReview.command';
 
 @Controller('product')
 export class ProductController {
@@ -32,7 +34,7 @@ export class ProductController {
   @Get()
   async findAll(@Query() query: any, @Req() req: Request, @Res() res: Response) {
     const products = await this.queryBus.execute(
-      new GetPoductsQuery(
+      new GetProductsQuery(
         query.categoryId,
         query.sortBy,
         query.sortOrder,
@@ -88,6 +90,12 @@ export class ProductController {
   async findOne(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
     const product = await this.queryBus.execute(new FindProductQuery(id));
     return res.status(200).json(product);
+  }
+
+  @Post(':id')
+  async createReview(@Param('id') id: string, @Body() body: CreateReviewDto,  @Req() req: Request, @Res() res: Response){
+      const review = await this.commandBus.execute(new CreateReviewCommand(req.user, id, body.comment, body.review))
+      return res.status(201).json({...review});
   }
 
   @Delete(':id')

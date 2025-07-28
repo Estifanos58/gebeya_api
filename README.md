@@ -20,7 +20,7 @@
   - [x] get store Data
   - [x] get product detail 
   - [] Notify Store Owner When certain Product quantity reachs Low Point ***
-  - [] Notify Store Owner When A Product is Purchased
+  - [x] Notify Store Owner When A Product is Purchased
 
 # Cart System
   - [x] Add/ update / remove items from Cart
@@ -35,7 +35,7 @@
   - [] Merchant see All Orders
 
 # Product Reviews and Ratings
-  - [] Review system(1-5 stars + comments)
+  - [x] Review system(1-5 stars + comments)
   - [x] Full-text search by name,  category
   - [x] Price range filtering
   - [x] Sort by price, populating, rating
@@ -65,7 +65,7 @@
 
 ⚙️ Future: Automation, Cron, Events, Queues
   - [] Cron job to clean expired carts
-  - [] Event-based notification system
+  - [x] Event-based notification system
   - [] Background queue to process emails
   - [] Low-stock product alert via queue
   - [] Retry failed payments automatically
