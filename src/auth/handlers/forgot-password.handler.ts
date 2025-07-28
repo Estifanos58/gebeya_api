@@ -62,7 +62,7 @@ export class ForgotPasswordHandler
         },
       };
 
-      await this.mailService.sendOtp(mail);
+      await this.mailService.sendMail(mail);
       return {
         message: 'Password reset successfully',
       };

@@ -2,7 +2,7 @@ import { Size, Store, User} from "@/entities";
 
 export type Skus = {
     size: Size,
-    price: string,
+    price: number,
     quantity: number,
     color: string
 }
