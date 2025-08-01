@@ -85,7 +85,7 @@ export class ChapaInitializePaymentHandler
         gateway: PaymentGateway.CHAPA,
         reference,
         user,
-        orderId,
+        order: { id: orderId },
         status: PaymentStatus.PENDING,
         paymentUrl: response.data?.data?.checkout_url,
       });

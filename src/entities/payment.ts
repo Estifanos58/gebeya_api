@@ -34,9 +34,6 @@ export class Payment {
   reference: string; // Unique transaction reference from gateway
 
   @Column({ nullable: true })
-  orderId: Order['id'];
-
-  @Column({ nullable: true })
   price: number; 
 
   @ManyToOne(() => User, user => user)

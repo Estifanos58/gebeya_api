@@ -6,8 +6,10 @@ export class Credentials {
   @PrimaryGeneratedColumn("uuid", { name: "id" })
   id: string;
 
-  @OneToOne(() => User, (user) => user.credentials, { eager: true  })
-  @JoinColumn({ name: "user_id" })
+  @OneToOne(() => User, (user) => user.credentials, {
+    onDelete: "CASCADE", // 👈 critical line
+  })
+  @JoinColumn({ name: "user_id" }) // 👈 assuming foreign key is stored here
   user: User;
 
   @Column()

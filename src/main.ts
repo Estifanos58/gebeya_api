@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 
@@ -17,6 +17,7 @@ async function bootstrap() {
 const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-docs', app, document);
   app.useGlobalPipes(new ValidationPipe());
+  app.useLogger(new Logger());
   app.use(cookieParser()); // Use cookie parser middleware to parse cookies
   await app.listen(process.env.PORT ?? 3000);
 }

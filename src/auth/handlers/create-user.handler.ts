@@ -6,7 +6,6 @@ import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { hashedPassword } from 'src/utils/hashedPassword';
 import { generateOtp } from 'src/utils/generateOtp';
-import { MailService } from 'src/mail/mail.service';
 import { generateJWTToken, storeTokenInCookie } from 'src/utils/generateToken';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRegisterEvent } from '../event/user_register.event';

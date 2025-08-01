@@ -13,6 +13,8 @@ import { VerifyOtpHandler } from './handlers/verifyOtp.handler';
 import { ResetPasswordHandler } from './handlers/reset-password.handler';
 import { GetUserHandler } from './handlers/get-user.handler';
 import { RefreshTokenHandler } from './handlers/refresh-token.handler';
+import { UserRegisterHandler } from './event/user_register.handler';
+import { UserPasswordResetHandler } from './event/user_password.handler';
 
 const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler, VerifyOtpHandler, ResetPasswordHandler, RefreshTokenHandler];
 const QueryHandlers = [GetUserHandler];
@@ -24,6 +26,6 @@ const QueryHandlers = [GetUserHandler];
     MailModule
   ],
   controllers: [AuthController],
-  providers: [...CommandHandlers, ...QueryHandlers],
+  providers: [...CommandHandlers, ...QueryHandlers, UserRegisterHandler, UserPasswordResetHandler],
 })
 export class AuthModule{}
