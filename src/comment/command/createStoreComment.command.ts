@@ -1,6 +1,6 @@
 import { Store, User } from "@/entities";
 
-export class CreateCommentCommand {
+export class CreateStoreCommentCommand {
     constructor(
         public readonly user: User,
         public readonly storeId: Store['id'],

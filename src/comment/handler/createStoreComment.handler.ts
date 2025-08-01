@@ -1,13 +1,12 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateCommentCommand } from "../command/createComment.command";
+import { CreateStoreCommentCommand } from "../command/createStoreComment.command";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Store, Comment } from "@/entities";
 import { Repository } from "typeorm";
-import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
 
-@CommandHandler(CreateCommentCommand)
-export class CreateCommentHandler implements ICommandHandler<CreateCommentCommand>{
+@CommandHandler(CreateStoreCommentCommand)
+export class CreateStoreCommentHandler implements ICommandHandler<CreateStoreCommentCommand>{
 
     constructor(
         @InjectRepository(Store)
@@ -17,7 +16,7 @@ export class CreateCommentHandler implements ICommandHandler<CreateCommentComman
         private readonly commentRepo: Repository<Comment>
     ){}
 
-    async execute(command: CreateCommentCommand): Promise<any> {
+    async execute(command: CreateStoreCommentCommand): Promise<any> {
         const {user, storeId, comment: message, review} = command
 
         try {
@@ -26,7 +25,7 @@ export class CreateCommentHandler implements ICommandHandler<CreateCommentComman
             const store = await this.storeRepo.find({where: {id: storeId}});
             if(!store) throw new HttpException({message: "Store Not Found"}, HttpStatus.NOT_FOUND)
 
-            console.log("User Creating: ", user)
+            // console.log("User Creating: ", user)
 
             const comment = this.commentRepo.create({
                 user,
@@ -42,7 +41,7 @@ export class CreateCommentHandler implements ICommandHandler<CreateCommentComman
                 data: comment
             }
         } catch (error) {
-            console.error("Error in CreateCommentHandler: ", error);
+            console.error("Error in CreateStoreCommentHandler: ", error);
             throw new HttpException({ message: "Server Issue"}, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }

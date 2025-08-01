@@ -29,6 +29,7 @@ import { CartModule } from './cart/cart.module';
 import { AuthenticateMiddleware } from './middleware/authenticate.middleware';
 import { PaymentModule } from './payment/payment.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -72,6 +73,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CartModule,
     ProductModule,
     PaymentModule,
+    CommentModule,
     ThrottlerModule.forRoot([{
       name: "short", 
       ttl: 1000,

@@ -8,9 +8,8 @@ import { CreateCategoryHandler } from "./handlers/create-category.handler";
 import { GetAllStoreHandler } from "./handlers/get-all-stores.handler";
 import { GetStoreHandler } from "./handlers/get-store.hanlder";
 import { DeleteStoreHandler } from "./handlers/deleteStore.handler";
-import { CreateCommentHandler } from "./handlers/create-comment.handler";
 
-const CommandHandler = [CreateStoreHandler, CreateCategoryHandler, DeleteStoreHandler, CreateCommentHandler];
+const CommandHandler = [CreateStoreHandler, CreateCategoryHandler, DeleteStoreHandler];
 const QueryHandler = [GetAllStoreHandler, GetStoreHandler];
 
 @Module({
