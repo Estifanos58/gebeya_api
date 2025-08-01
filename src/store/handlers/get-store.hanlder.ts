@@ -16,11 +16,15 @@ export class GetStoreHandler implements IQueryHandler<GetStoreQuery> {
     async execute(query: GetStoreQuery): Promise<any> {
         const { storeId } = query;
 
+        // console.log("storeId: ", storeId);
+
         const relations = [
             'user',
-            'products',
-            'products.skus',
-            'products.category',
+            'product',
+            'product.skus',
+            'product.category',
+            'comment',
+            'comment.user',
             // Add more relations here if needed, like orders, ratings, etc.
         ];
 

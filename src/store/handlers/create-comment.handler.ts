@@ -18,7 +18,7 @@ export class CreateCommentHandler implements ICommandHandler<CreateCommentComman
     ){}
 
     async execute(command: CreateCommentCommand): Promise<any> {
-        const {userId, storeId, comment: message, review} = command
+        const {user, storeId, comment: message, review} = command
 
         try {
             // No Need to See If the user Exists or not b/c the middleware will make sure that the user exists
@@ -26,8 +26,10 @@ export class CreateCommentHandler implements ICommandHandler<CreateCommentComman
             const store = await this.storeRepo.find({where: {id: storeId}});
             if(!store) throw new HttpException({message: "Store Not Found"}, HttpStatus.NOT_FOUND)
 
+            console.log("User Creating: ", user)
+
             const comment = this.commentRepo.create({
-                user: {id: userId},
+                user,
                 store: {id: storeId},
                 message,
                 review
@@ -40,7 +42,8 @@ export class CreateCommentHandler implements ICommandHandler<CreateCommentComman
                 data: comment
             }
         } catch (error) {
-             throw new HttpException({ message: "Server Issue"}, HttpStatus.INTERNAL_SERVER_ERROR)
+            console.error("Error in CreateCommentHandler: ", error);
+            throw new HttpException({ message: "Server Issue"}, HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 }

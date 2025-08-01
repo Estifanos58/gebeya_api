@@ -48,6 +48,7 @@ export class AuthenticateMiddleware implements NestMiddleware{
                 return res.status(404).json({ message: 'User not found' });
             }
 
+            // console.log("Authenticated User: ", user);
             req.user = user; // Attach user to request object
             req.userId = user.id; // Attach userId to request object
             req.userRole = user.role;

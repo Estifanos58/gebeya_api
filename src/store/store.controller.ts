@@ -60,6 +60,7 @@ export class StoreController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
+    // console.log("id: ", id)
     const store = await this.queryBus.execute(new GetStoreQuery(id));
     return res.status(200).json({ ...store });
   }
@@ -71,20 +72,21 @@ export class StoreController {
     @Res() res: Response,
   ) {
     const store = await this.commandBus.execute(
-      new DeleteStoreCommand(id, req.user.id),
+      new DeleteStoreCommand(id, req.user),
     );
 
     return res.status(200).json({ ...store });
   }
 
-  @Post("comment/:id")
+  @Post(":id/comment")
   async createComment (
     @Param("id") id: string,
     @Body() createComment: createCommentDto,
     @Req() req: Request,
     @Res() res: Response
   ){
-    const comment = await this.commandBus.execute(new CreateCommentCommand(req.userId! , id , createComment.comment, createComment.review ));
+    // console.log("USer FORM Request: ", req.user);
+    const comment = await this.commandBus.execute(new CreateCommentCommand(req.user , id , createComment.comment, createComment.review ));
 
     return res.status(201).json({...comment});
   }

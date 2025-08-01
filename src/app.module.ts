@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -90,12 +90,18 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     }
   ],
 })
-export class AppModule implements NestModule{
-    configure(consumer: MiddlewareConsumer) {
-      consumer.apply(AuthenticateMiddleware).exclude('auth/login', 'auth/signup', 'auth/forgot-password').forRoutes('auth/*path')
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthenticateMiddleware)
+      .exclude(
+        { path: 'auth/login', method: RequestMethod.ALL },
+        { path: 'auth/signup', method: RequestMethod.ALL },
+        { path: 'auth/refresh-token', method: RequestMethod.ALL },
+      )
+      .forRoutes({ path: '*', method: RequestMethod.ALL }); // 👈 applies to all routes
   }
 }
-
 
 
 
