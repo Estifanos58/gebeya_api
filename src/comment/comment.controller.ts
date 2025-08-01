@@ -1,10 +1,11 @@
-import { Body, Controller, Param, Patch, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Delete, Param, Patch, Post, Req, Res } from "@nestjs/common";
 import { createStoreCommentDto } from "./dto/createStoreCommentDto";
 import { CommandBus } from "@nestjs/cqrs";
 import { Request, Response } from "express";
 import { CreateStoreCommentCommand } from "./command/createStoreComment.command";
 import { UpdateStoreCommentCommand } from "./command/updateStoreComment.command";
 import { UpdateStoreCommentDto } from "./dto/updateStoreCommentDto";
+import { DeleteStoreCommentCommand } from "./command/deleteStoreComment.command";
 
 @Controller('comment')
 export class CommentController {
@@ -41,5 +42,19 @@ export class CommentController {
         );
 
         return res.status(200).json(updatedComment);
+    }
+
+    @Delete('store/:id/:commentId')
+    async deleteStoreComment(
+        @Param("id") id: string,
+        @Param("commentId") commentId: string,
+        @Req() req: Request,
+        @Res() res: Response
+    ) {
+        const deletedComment = await this.commandBus.execute(
+            new DeleteStoreCommentCommand(req.userId!, id, commentId)
+        );
+
+        return res.status(200).json(deletedComment);
     }
 }
