@@ -3,8 +3,9 @@ import { Module } from "@nestjs/common";
 import { CqrsModule } from "@nestjs/cqrs";
 import { CommentController } from "./comment.controller";
 import { CreateStoreCommentHandler } from "./handler/createStoreComment.handler";
+import { UpdateStoreCommentHandler } from "./handler/updateStoreComment.handler";
 
-const CommandHandlers = [CreateStoreCommentHandler]
+const CommandHandlers = [CreateStoreCommentHandler, UpdateStoreCommentHandler];
 
 @Module({
     imports: [

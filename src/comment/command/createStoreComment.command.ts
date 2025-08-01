@@ -5,6 +5,6 @@ export class CreateStoreCommentCommand {
         public readonly user: User,
         public readonly storeId: Store['id'],
         public readonly comment: string,
-        public readonly review: number,
+        public readonly review: 1 | 2 | 3 | 4,
     ){}
 }
