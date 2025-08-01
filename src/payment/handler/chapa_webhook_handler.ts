@@ -41,7 +41,7 @@ export class ChapaWebhookHandler
     if (status === 'success') {
       // 1. Mark order as paid
       await this.orderRepository.update(
-        { id: payment.orderId },
+        { id: payment.order?.id },
         { isPaid: true },
       );
 

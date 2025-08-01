@@ -5,8 +5,7 @@ import { Credentials, User } from '@/entities';
 import { In, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { generateUniqueToken } from 'src/utils/generateOtp';
-import { PASSWORD_RESET_TEMPLATE } from 'src/utils/templates';
-import { MailService } from 'src/mail/mail.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @CommandHandler(ForgotPasswordCommand)
 export class ForgotPasswordHandler
@@ -15,7 +14,7 @@ export class ForgotPasswordHandler
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     @InjectRepository(Credentials) private readonly credential: Repository<Credentials>,
-    private readonly mailService: MailService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute(command: ForgotPasswordCommand): Promise<any> {
@@ -45,24 +44,14 @@ export class ForgotPasswordHandler
 
       await this.credential.save(credentials);
 
-      // send an Email to the user with the reset link
-      const link = `https://yourapp.com/reset-password?token=${temporaryToken}&email=${email}`;
+      // Emit an event for password reset request
+      this.eventEmitter.emit('user.passwordResetRequested', {
+        user: user,
+        temporaryToken: temporaryToken,
+        expiresAt: credentials.tokenExpiresAt.toLocaleString()
+      });
 
-      // Send OTP to the user via email
-      const html = PASSWORD_RESET_TEMPLATE;
-      const mail = {
-        to: user.email,
-        subject: 'Password Reset Request',
-        html: html,
-        placeholders: {
-          name: user.firstName,
-          resetLink: link,
-          expiresAt: credentials.tokenExpiresAt.toLocaleString(), // Format the date as needed
-          year: new Date().getFullYear().toString(),
-        },
-      };
 
-      await this.mailService.sendMail(mail);
       return {
         message: 'Password reset successfully',
       };

@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { StoreModule } from './store/store.module';
 import {
@@ -32,30 +32,37 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'estif',
-      password: 'mypassword',
-      database: 'gebeya',
-      entities: [
-        User,
-        CartItem,
-        Cart,
-        Order,
-        OrderItem,
-        Payment,
-        Product,
-        ProductSkus,
-        Category,
-        Credentials,
-        Store,
-        Comment
-      ], // This is imported for the synchrozation
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
     }),
-    ConfigModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+          imports: [ConfigModule],
+          inject: [ConfigService],
+          useFactory: (configService: ConfigService) => ({
+            type: 'postgres',
+            url: configService.get<string>('DATABASE_URL'),
+            ssl: {
+              rejectUnauthorized: false, // Required for Neon's SSL
+            },
+            autoLoadEntities: true,
+            entities:[
+              User,
+              CartItem,
+              Cart,
+              Order,
+              OrderItem,
+              Payment,
+              Product,
+              ProductSkus,
+              Category,
+              Credentials,
+              Store,
+              Comment
+            ],
+            synchronize: true, // Set to false in production
+          }),
+        }),
     EventEmitterModule.forRoot(),
     AuthModule,
     MailModule,
@@ -66,7 +73,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     ProductModule,
     PaymentModule,
     ThrottlerModule.forRoot([{
-      name: "short",
+      name: "short", 
       ttl: 1000,
       limit: 3
     },{
