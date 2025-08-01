@@ -41,14 +41,14 @@ export class ChapaInitializePaymentHandler
       relations: ['user'],
     });
 
-    if (!store || !store.chapaApiKey) {
+    if (!store) {
       throw new HttpException(
-        'Store Chapa key not configured',
+        'Store not found',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    const decryptedKey = decrypt(store.chapaApiKey);
+    const chapaApiKey = this.configService.get<string>('CHAPA_API_KEY');
     const chapaUrl = this.configService.get<string>('CHAPA_INITIALIZER');
     const BASE_URL = this.configService.get<string>('BASE_URL');
     const FRONTEND_URL = this.configService.get<string>('FRONTEND_URL');
@@ -64,7 +64,7 @@ export class ChapaInitializePaymentHandler
       callback_url: `${BASE_URL}/payments/chapa/webhook`,
       return_url: `${FRONTEND_URL}/thank-you`,
       customization: {
-        title: store.name,
+        title: "Payment for Order",
         description: 'Payment from customer',
       },
     };
@@ -75,7 +75,7 @@ export class ChapaInitializePaymentHandler
         payload,
         {
           headers: {
-            Authorization: `Bearer ${decryptedKey}`,
+            Authorization: `Bearer ${chapaApiKey}`,
           },
         },
       );
@@ -86,6 +86,7 @@ export class ChapaInitializePaymentHandler
         reference,
         user,
         order: { id: orderId },
+        store,
         status: PaymentStatus.PENDING,
         paymentUrl: response.data?.data?.checkout_url,
       });

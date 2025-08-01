@@ -31,8 +31,6 @@ export class Store {
     @Column({name: "is_verified", type: "boolean" ,default: false})
     isVerified: boolean;
 
-    @Column({ name: 'chapa_api_key', nullable: true })
-    chapaApiKey: string; // Encrypted string
 
     @OneToMany(()=> Payment, payment => payment.store, { nullable: true })
     payments: Payment[];
