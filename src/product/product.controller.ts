@@ -21,6 +21,7 @@ import { UpdateProductCommand } from './command/updateProduct.command';
 import { DeleteProductCommand } from './command/deleteProduct.command';
 import { FindProductQuery } from './query/find-product.query';
 import { GetProductsQuery } from './query/get-products.query';
+import { QueryProductsDto } from './dto/query-products.dto';
 
 @Controller('product')
 export class ProductController {
@@ -30,9 +31,10 @@ export class ProductController {
   ) {}
 
   @Get()
-  async findAll(@Query() query: any, @Req() req: Request, @Res() res: Response) {
+  async findAll(@Query() query: QueryProductsDto, @Req() req: Request, @Res() res: Response) {
     const products = await this.queryBus.execute(
       new GetProductsQuery(
+        query.storeId,
         query.categoryId,
         query.sortBy,
         query.sortOrder,

@@ -20,5 +20,6 @@ export class CreateProductDto{
      storeId: Store["id"];
 
      @IsArray()
+     @IsNotEmpty({ each: true})
      skus: Array<Skus>
 }

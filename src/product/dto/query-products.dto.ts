@@ -1,13 +1,6 @@
+import { ProductSortBy } from "../query/get-products.query";
 
-export enum ProductSortBy {
-  CREATED_AT = 'createdAt', 
-  PRICE = 'price',
-  NAME = 'name',
-  RATING = 'rating',
-}
-
-
-export class GetProductsQuery {
+export class QueryProductsDto {
   constructor(
     public readonly storeId?: string,
     public readonly categoryId?: string,

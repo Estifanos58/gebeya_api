@@ -31,5 +31,8 @@ export class Product {
 
   @OneToMany(()=> Comment, (comment)=> comment.product, {cascade: true})
   comment: Comment[];
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
   
 }

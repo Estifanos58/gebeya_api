@@ -15,6 +15,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
 
   async execute(query: GetProductsQuery): Promise<any> {
     const {
+      storeId,
       categoryId,
       sortBy,
       sortOrder,
@@ -36,6 +37,10 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
         .leftJoinAndSelect('product.skus', 'skus')
         .leftJoinAndSelect('product.store', 'store')
         .leftJoinAndSelect('product.comment', 'comment');
+
+      if (storeId) {
+        queryBuilder.andWhere('store.id = :storeId', { storeId });
+      }
 
       if (categoryId) {
         queryBuilder.andWhere('category.id = :categoryId', { categoryId });
@@ -108,6 +113,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
         },
       };
     } catch (error) {
+      console.log("Error retrieving products:", error);
       throw new HttpException(
         { message: 'Failed to retrieve products' },
         HttpStatus.INTERNAL_SERVER_ERROR,
