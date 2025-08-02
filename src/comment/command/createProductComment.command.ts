@@ -1,6 +1,6 @@
 import { Product, User } from "@/entities";
 
-export class CreateReviewCommand {
+export class CreateProductCommentCommand {
     constructor(
         public readonly user: User,
         public readonly productId: Product['id'],

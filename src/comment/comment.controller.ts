@@ -6,6 +6,8 @@ import { CreateStoreCommentCommand } from "./command/createStoreComment.command"
 import { UpdateStoreCommentCommand } from "./command/updateStoreComment.command";
 import { UpdateStoreCommentDto } from "./dto/updateStoreCommentDto";
 import { DeleteStoreCommentCommand } from "./command/deleteStoreComment.command";
+import { CreateProductCommentDto } from "./dto/createProductCommentDto";
+import { CreateProductCommentCommand } from "./command/createProductComment.command";
 
 @Controller('comment')
 export class CommentController {
@@ -56,5 +58,19 @@ export class CommentController {
         );
 
         return res.status(200).json(deletedComment);
+    }
+
+    @Post('product/:productId')
+    async createProductComment(
+        @Param("productId") productId: string,
+        @Body() createReviewDto: CreateProductCommentDto,
+        @Req() req: Request,
+        @Res() res: Response
+    ) {
+        const { comment, review } = createReviewDto;
+
+        const result = await this.commandBus.execute( new CreateProductCommentCommand(req.user, productId, comment, review));
+
+        return res.status(201).json(result);
     }
 }

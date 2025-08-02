@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { CreateReviewCommand } from "../command/createReview.command";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Comment, Product } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus, InternalServerErrorException, NotFoundException } from "@nestjs/common";
+import { CreateProductCommentCommand } from "../command/createProductComment.command";
 
-@CommandHandler(CreateReviewCommand)
-export class CreateReviewHandler implements ICommandHandler<CreateReviewCommand>{
+@CommandHandler(CreateProductCommentCommand)
+export class CreateProductCommentHandler implements ICommandHandler<CreateProductCommentCommand>{
 
     constructor(
         @InjectRepository(Comment)
@@ -16,7 +16,7 @@ export class CreateReviewHandler implements ICommandHandler<CreateReviewCommand>
         private readonly productRepository: Repository<Product>
     ){}
 
-    async execute(command: CreateReviewCommand): Promise<any> {
+    async execute(command: CreateProductCommentCommand): Promise<any> {
         const { user, productId, comment: message, review} = command
 
         try {
