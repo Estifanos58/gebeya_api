@@ -14,7 +14,7 @@ export class ProductSkus {
   @PrimaryGeneratedColumn("uuid", { name: "id" })
   id: string;
 
-  @ManyToOne(() => Product, (product) => product.skus)
+  @ManyToOne(() => Product, (product) => product.skus, {onDelete: "CASCADE"})
   @JoinColumn({ name: "product_id" })
   product: Product;
 

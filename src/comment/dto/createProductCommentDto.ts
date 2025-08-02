@@ -5,5 +5,5 @@ export class CreateProductCommentDto {
     comment: string;
 
     @IsNumber()
-    review: 1 | 2 | 3 | 4 | 5
+    review: 1 | 2 | 3 | 4 
 }

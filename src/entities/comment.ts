@@ -17,7 +17,7 @@ export class Comment {
     @Column({name: "message"})
     message: string;
 
-    @ManyToOne(()=> Product, (product)=>product.comment)
+    @ManyToOne(()=> Product, (product)=>product.comment, {onDelete: "CASCADE"})
     @JoinColumn({name: "product_id"})
     product: Product
 

@@ -7,10 +7,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { UpdateProductHandler } from './handler/update-product.handler';
 import { FindProductHandler } from './handler/find-product.handler';
 import { GetProductsHandler } from './handler/get-products.handler';
-import { CreateReviewHandler } from './handler/create-review.hander';
+import { DeleteProductHandler } from './handler/delete-product.handler';
 
 
-const CommandHandlers = [CreateProductHandler, UpdateProductHandler, CreateReviewHandler];
+const CommandHandlers = [CreateProductHandler, UpdateProductHandler, DeleteProductHandler];
 const QueryHandlers = [FindProductHandler, GetProductsHandler];
 
 @Module({
