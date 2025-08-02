@@ -54,7 +54,7 @@ export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
         throw new HttpException(`Product SKU ${productSkuId} not found`, HttpStatus.NOT_FOUND);
       }
 
-      if (cartItem.quantity + quantity >= storeProduct.quantity) {
+      if (quantity >= storeProduct.quantity) {
         throw new HttpException(
           `Requested quantity (${quantity}) exceeds available stock (${storeProduct.quantity})`,
           HttpStatus.BAD_REQUEST

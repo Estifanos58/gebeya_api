@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from "@ne
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { CreateCartDto } from "./dto/create-cart.dto";
 import { Request, Response } from "express";
-import { UpdateCartDto } from "./dto/update-cart.dto";
 import { CreateCartCommand } from "./command/create-cart.command";
 import { updateCartCommand } from "./command/update-cart.command";
 import { DeleteCartCommand } from "./command/delete-cart.command";

@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateCartCommand } from '../command/create-cart.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cart, CartItem } from '@/entities';
+import { Cart, CartItem, ProductSkus } from '@/entities';
 import { Repository } from 'typeorm';
 
 @CommandHandler(CreateCartCommand)
@@ -12,7 +12,10 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
     private readonly cartRepository: Repository<Cart>,
 
     @InjectRepository(CartItem)
-    private readonly cartItemRepository: Repository<CartItem>,
+    private readonly cartItemRepository: Repository<CartItem>, 
+
+    @InjectRepository(ProductSkus)
+    private readonly productSkusRepository: Repository<ProductSkus>,
   ) {}
 
   async execute(command: CreateCartCommand): Promise<any> {
@@ -21,8 +24,23 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
     try {
       let cart = await this.cartRepository.findOne({
         where: { user: { id: userId } },
-        relations: ['cartItems', 'cartItems.productSku'],
+        relations: ['cartItems', 'cartItems.productSku', 'user'],
       });
+
+      const productSku = await this.productSkusRepository.findOne({
+        where: { id: productSkuId },
+      });
+
+      if(!productSku){
+        throw new HttpException(`Product SKU ${productSkuId} not found`, HttpStatus.NOT_FOUND);
+      }
+
+      if(quantity > productSku.quantity) {
+        throw new HttpException(
+          `Requested quantity (${quantity}) exceeds available stock (${productSku.quantity})`,
+          HttpStatus.BAD_REQUEST
+        );
+      }
 
       // If the cart exists
       if (cart) {
@@ -30,16 +48,26 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
           (item) => item.productSku.id === productSkuId,
         );
 
+
         if (existingItem) {
+          // Check if the quantity is above the current stock 
+           if (existingItem.quantity + quantity >= productSku.quantity) {
+              throw new HttpException(
+                `Requested quantity (${quantity}) exceeds available stock (${productSku.quantity})`,
+                HttpStatus.BAD_REQUEST
+              );
+            }
           existingItem.quantity += quantity;
           await this.cartItemRepository.save(existingItem);
         } else {
           const newItem = this.cartItemRepository.create({
             productSku: { id: productSkuId },
             quantity,
-            cart: { id: cart.id },
+            cart,
           });
+
           await this.cartItemRepository.save(newItem);
+          cart.cartItems.push(newItem);
         }
 
         await this.cartRepository.save(cart);
