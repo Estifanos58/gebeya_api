@@ -8,5 +8,7 @@ export function  calculateCartTotal(cartItems: CartItem[]): number {
 }
 
 export function generateReference () {
-  return `tr-ref:${randomUUID()}`
+   const timestamp = Date.now(); // Ensures uniqueness
+  const randomString = Math.random().toString(36).substring(2, 10); // Alphanumeric
+  return `${timestamp}-${randomString}`; // Format: tx-<timestamp>-<random>
 }

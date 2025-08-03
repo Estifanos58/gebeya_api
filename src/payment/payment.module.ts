@@ -8,8 +8,9 @@ import { HandlePaymentEvent } from "./event/handle_event";
 import { ConfigModule } from "@nestjs/config";
 import { HttpModule } from "@nestjs/axios";
 import { MailModule } from "@/mail/mail.module";
+import { ChapaVerifyHandler } from "./handler/chapa_verify_handler";
 
-const CommandHandlers = [ChapaInitializePaymentHandler, ChapaWebhookHandler];
+const CommandHandlers = [ChapaInitializePaymentHandler, ChapaWebhookHandler, ChapaVerifyHandler];
 const QueryHandlers= []
 
 @Module({

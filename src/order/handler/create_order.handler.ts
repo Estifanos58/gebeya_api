@@ -1,4 +1,4 @@
-import { ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateOrderCommand } from '../command/create_order.command';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart, CartItem } from '@/entities';
@@ -12,12 +12,11 @@ import { Order } from '@/entities/order';
 import { calculateCartTotal } from '@/utils/generalFunctions';
 import { randomUUID } from 'crypto';
 
+@CommandHandler(CreateOrderCommand)
 export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   constructor(
     @InjectRepository(Cart)
     private readonly cartRepo: Repository<Cart>,
-    @InjectRepository(CartItem)
-    private readonly cartItem: Repository<CartItem>,
     @InjectRepository(OrderItem)
     private readonly orderItemRepo: Repository<OrderItem>,
     @InjectRepository(Order)
@@ -27,60 +26,55 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
   async execute(command: CreateOrderCommand): Promise<any> {
     const { user, cartId, deliveryAddress, contactInfo } = command;
 
-    let orderDeliveryAddress = deliveryAddress ?? user?.address;
-    let orderContactInfo = contactInfo ?? user?.phoneNumber;
+    const orderDeliveryAddress = deliveryAddress ?? user?.address;
+    const orderContactInfo = contactInfo ?? user?.phoneNumber;
 
-    if(!orderDeliveryAddress || !orderContactInfo) {
-      throw new InternalServerErrorException('Delivery address and contact info are required')
+    if (!orderDeliveryAddress || !orderContactInfo) {
+      throw new InternalServerErrorException(
+        'Delivery address and contact info are required',
+      );
     }
 
     try {
       const cart = await this.cartRepo.findOne({
-        where: { id: cartId, user: user },
+        where: { id: cartId, user: { id: user.id } },
         relations: ['cartItems', 'cartItems.productSku', 'user'],
       });
 
-
       if (!cart) {
-        throw new NotFoundException(`Cart Not Found With the ${cartId} :id`);
+        throw new NotFoundException(`Cart not found with id ${cartId}`);
       }
 
       const totalPrice = calculateCartTotal(cart.cartItems);
 
-      let orderItems: OrderItem[] = [];
-
-      for (const item of cart.cartItems) {
-        const orderItem = this.orderItemRepo.create({
-          productSkus: item.productSku,
-          quantity: item.quantity,
-        });
-        const savedOrderItem = await this.orderItemRepo.save(orderItem);
-        orderItems.push(savedOrderItem);
-        await this.cartItem.remove(item)
-      }
-
       const order = this.orderRepo.create({
-        user: user,
+        user,
         total: totalPrice,
-        items: orderItems,
         orderNumber: `ORD-${randomUUID()}`,
         deliveryAddress: orderDeliveryAddress,
         contactInfo: orderContactInfo,
+        items: cart.cartItems.map(item =>
+          this.orderItemRepo.create({
+            price: item.productSku.price,
+            productSkus: item.productSku,
+            quantity: item.quantity,
+          }),
+        ),
       });
 
-      await Promise.all([
-         this.cartRepo.remove(cart),
-         this.orderRepo.save(order),
-      ]);
+      // Save order and all its items in one step via cascade
+      const savedOrder = await this.orderRepo.save(order);
+
+      // Delete cart — cartItems will be deleted automatically via cascade
+      await this.cartRepo.delete(cart.id);
 
       return {
-        message: 'Order created Successfully',
-        data: order,
+        message: 'Order created successfully',
+        data: savedOrder,
       };
     } catch (error) {
       console.error('Order creation failed:', error);
       throw new InternalServerErrorException(error.message);
-
     }
   }
 }

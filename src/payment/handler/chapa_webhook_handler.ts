@@ -24,6 +24,8 @@ export class ChapaWebhookHandler
   async execute(command: ChapaWebhookCommand): Promise<any> {
     const { tx_ref, status } = command;
 
+    console.log("CHAPA has Send Me")
+
     const payment = await this.paymentRepo.findOne({
       where: { reference: tx_ref },
       relations: ['user'],

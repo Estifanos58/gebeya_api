@@ -11,7 +11,7 @@ export class Cart {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @OneToMany(() => CartItem, (item) => item.cart, { cascade: true })
+  @OneToMany(() => CartItem, (item) => item.cart, { cascade: true , onDelete: 'CASCADE' })
   cartItems: CartItem[];
 
   @Column({ name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP" })

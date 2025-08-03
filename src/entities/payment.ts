@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { Order } from "./order";
 import { Store } from "./store";
@@ -18,10 +18,10 @@ export enum PaymentGateway {
 
 @Entity({ name: "payment" })
 export class Payment {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'id' })
   id: string;
 
-  @Column()
+  @Column({ type: 'decimal', name: "amount" })
   amount: number;
 
   @Column({type: 'enum', enum:PaymentStatus, default: PaymentStatus.PENDING})
@@ -30,25 +30,24 @@ export class Payment {
   @Column({type: 'enum', enum:PaymentGateway, default: PaymentGateway.CHAPA})
   gateway: PaymentGateway;
 
-  @Column()
+  @Column({name: "reference", unique: true})
   reference: string; // Unique transaction reference from gateway
 
-  @Column({ nullable: true })
-  price: number; 
 
-  @ManyToOne(() => User, user => user)
+  @ManyToOne(() => User, user => user.payments)
   user: User;
 
-  @Column({nullable: true})
+  @Column({name:"paymet_url" , nullable: true})
   paymentUrl: string;
 
   @Column({ name: "currency", default: 'ETB' })
   currency: string; // Default to 'ETB' (Ethiopian Birr)
 
-  @OneToOne(() => Order, order => order.payment, { nullable: true })
+  @OneToOne(() => Order, order => order.payment)
+  @JoinColumn({ name: "order_id" }) // This side owns the FK
   order: Order;
 
-  @ManyToOne(()=> Store, store => store.payments, { nullable: true })
+  @ManyToOne(()=> Store, store => store.payments)
   store: Store;
 
   @CreateDateColumn()

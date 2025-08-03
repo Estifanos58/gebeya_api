@@ -4,6 +4,7 @@ import { Credentials } from "./credentials";
 import { Comment } from "./comment";
 import { Store } from "./store";
 import { Order } from "./order";
+import { Payment } from "./payment";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -57,14 +58,17 @@ export class User {
   @JoinColumn({ name: "credentials_id" })
   credentials: Credentials;
 
-  @OneToMany(()=> Comment, (comment)=> comment.user)
+  @OneToMany(() => Payment, payment => payment.user, {nullable: true})
+  payments: Payment[];
+
+  @OneToMany(()=> Comment, (comment)=> comment.user, {nullable: true})
   comment: Comment[];
 
-  @OneToOne(()=>Store , (store)=> store.user, {cascade: true})
+  @OneToOne(()=>Store , (store)=> store.user, {cascade: true, nullable: true})
   @JoinColumn({ name: "store_id" })
   store: Store;
 
-  @OneToMany(()=>Order, (order)=>order.user)
+  @OneToMany(()=>Order, (order)=>order.user, {nullable: true})
   @JoinColumn({name : "order_id"})
   orders: Order[];
 }

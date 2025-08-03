@@ -18,9 +18,6 @@ export class InitializePaymentDto {
     @IsString()
     currency: string;
 
-    @IsPositive()
-    amount: number;
-
     @IsUUID()
     orderId: Order['id']
 

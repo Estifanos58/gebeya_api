@@ -1,4 +1,4 @@
-import { IQueryHandler } from '@nestjs/cqrs';
+import { CommandHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetOrdersQuery } from '../query/get_orders.query';
 import {
   InternalServerErrorException,
@@ -8,6 +8,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from '@/entities';
 import { FindOptionsWhere, Repository } from 'typeorm';
 
+
+@CommandHandler(GetOrdersQuery)
 export class GetOrdersHandler implements IQueryHandler<GetOrdersQuery> {
   constructor(
     @InjectRepository(Order)

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { User } from './user';
 import { OrderItem } from './order_item';
 import { Payment } from './payment';
@@ -13,7 +13,7 @@ export enum OrderStatus{
 
 @Entity()
 export class Order {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid", { name: 'order_id' })
   id: number;
 
   @ManyToOne(() => User, user => user.orders)
@@ -37,12 +37,12 @@ export class Order {
   @Column({ name: 'is_paid', default: false })
   isPaid: boolean;
 
-  @OneToOne(() => Payment, payment => payment.order, { nullable: true })
+ @OneToOne(() => Payment, payment => payment.order)
   payment: Payment;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true })
+  @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true})
   items: OrderItem[];
 }

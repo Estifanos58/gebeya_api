@@ -1,28 +1,28 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
-import { DeleteStoreCommentCommand } from "../command/deleteStoreComment.command";
+import { DeleteCommentCommand } from "../command/deleteComment.command";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Comment } from "@/entities";
 import { Repository } from "typeorm";
 import { NotFoundException } from "@nestjs/common";
 
-@CommandHandler(DeleteStoreCommentCommand)
-export class DeleteStoreCommentHandler implements ICommandHandler<DeleteStoreCommentCommand> {
+@CommandHandler(DeleteCommentCommand)
+export class DeleteCommentHandler implements ICommandHandler<DeleteCommentCommand> {
 
     constructor(
         @InjectRepository(Comment)
         private readonly commentRepo: Repository<Comment>,
     ){}
 
-    async execute(command: DeleteStoreCommentCommand): Promise<any> {
-        const {userId, storeId, commentId} = command;
+    async execute(command: DeleteCommentCommand): Promise<any> {
+        const {userId, commentId} = command;
 
         const comment = await this.commentRepo.findOne({
-            where: { id: commentId, store: { id: storeId }, user: { id: userId } },
+            where: { id: commentId, user: { id: userId } },
             relations: ['user', 'store'],
         });
 
         if(!comment) {
-            throw new NotFoundException(`Comment with ID ${commentId} not found for store ${storeId}`);
+            throw new NotFoundException(`Comment with ID ${commentId} not found`);
         }
 
         await this.commentRepo.remove(comment);

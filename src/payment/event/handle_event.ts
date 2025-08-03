@@ -29,7 +29,7 @@ export class HandlePaymentEvent {
 
    const paymentDetails = await this.paymentRepository.findOne({
     where: { id: paymentId },
-    relations: ['user', 'order', 'store', 'order.items', 'order.items.productSkus', 'order.items.productSkus.product'],
+    relations: ['user', 'order', 'store', 'store.user' , 'order.items', 'order.items.productSkus', 'order.items.productSkus.product'],
    })
 
     if(!paymentDetails) {

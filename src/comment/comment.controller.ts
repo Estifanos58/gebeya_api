@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 import { CreateStoreCommentCommand } from "./command/createStoreComment.command";
 import { UpdateStoreCommentCommand } from "./command/updateStoreComment.command";
 import { UpdateStoreCommentDto } from "./dto/updateStoreCommentDto";
-import { DeleteStoreCommentCommand } from "./command/deleteStoreComment.command";
+import { DeleteCommentCommand } from "./command/deleteComment.command";
 import { CreateProductCommentDto } from "./dto/createProductCommentDto";
 import { CreateProductCommentCommand } from "./command/createProductComment.command";
 
@@ -46,15 +46,14 @@ export class CommentController {
         return res.status(200).json(updatedComment);
     }
 
-    @Delete('store/:id/:commentId')
+    @Delete('/:commentId')
     async deleteStoreComment(
-        @Param("id") id: string,
         @Param("commentId") commentId: string,
         @Req() req: Request,
         @Res() res: Response
     ) {
         const deletedComment = await this.commandBus.execute(
-            new DeleteStoreCommentCommand(req.userId!, id, commentId)
+            new DeleteCommentCommand(req.userId!, commentId)
         );
 
         return res.status(200).json(deletedComment);
