@@ -22,6 +22,7 @@ import { DeleteProductCommand } from './command/deleteProduct.command';
 import { FindProductQuery } from './query/find-product.query';
 import { GetProductsQuery } from './query/get-products.query';
 import { QueryProductsDto } from './dto/query-products.dto';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('product')
 export class ProductController {
@@ -31,6 +32,11 @@ export class ProductController {
   ) {}
 
   @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieve a list of products',
+    type: [CreateProductDto], // Adjust the type as necessary
+  })
   async findAll(@Query() query: QueryProductsDto, @Req() req: Request, @Res() res: Response) {
     const products = await this.queryBus.execute(
       new GetProductsQuery(
@@ -51,6 +57,11 @@ export class ProductController {
 
   @Roles([UserRole.MERCHANT]) // Example roles, adjust as necessary
   @Post()
+  @ApiResponse({
+    status: 201,
+    description: 'Product created successfully',
+    type: CreateProductDto, // Adjust the type as necessary
+  })
   async create(
     @Body() createProductDto: CreateProductDto,
     @Req() req: Request,
@@ -71,6 +82,11 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Product updated successfully',
+    type: UpdateProductDto, // Adjust the type as necessary
+  })
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Req() req: Request, @Res() res: Response) {
     const updatedProduct = await this.commandBus.execute(
       new UpdateProductCommand(
@@ -87,12 +103,21 @@ export class ProductController {
   }
 
   @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieve a product by ID',
+    type: CreateProductDto, // Adjust the type as necessary
+  })
   async findOne(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
     const product = await this.queryBus.execute(new FindProductQuery(id));
     return res.status(200).json(product);
   }
 
   @Delete(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Product deleted successfully', // Adjust the type as necessary
+  })
   async remove(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
     const product = await this.commandBus.execute(new DeleteProductCommand(req.userId!, id));
     return res.status(200).json({...product});

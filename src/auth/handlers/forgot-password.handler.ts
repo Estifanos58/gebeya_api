@@ -53,7 +53,7 @@ export class ForgotPasswordHandler
 
 
       return {
-        message: 'Password reset successfully',
+        message: 'Password reset email sent successfully',
       };
     } catch (error) {
       throw new HttpException(

@@ -39,7 +39,7 @@ export class CreateProductCommentHandler implements ICommandHandler<CreateProduc
             await this.commentRepository.save(comment);
 
             return {
-                message: "Comment added Successfully"
+                message: "Product comment added successfully"
             }
         } catch (error) {
             console.error('Error happed at Create Review Handler: ', error.message)

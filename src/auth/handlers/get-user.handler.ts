@@ -17,7 +17,7 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery>{
             throw new HttpException({ message: "User Not Found"}, HttpStatus.NOT_FOUND)
         }
         return {
-            message: "User Found",
+            message: "User data retrieved successfully",
             data: user
         }
     }

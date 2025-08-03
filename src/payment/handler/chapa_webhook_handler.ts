@@ -62,6 +62,6 @@ export class ChapaWebhookHandler
       // 3. Optionally notify merchant or admin
     }
 
-    return { message: 'Webhook processed' };
+    return { message: 'Webhook processed successfully' };
   }
 }

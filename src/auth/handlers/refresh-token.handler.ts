@@ -87,7 +87,7 @@ export class RefreshTokenHandler
     await this.credRepo.save(credential);
 
     return {
-      message: 'Token Refreshed',
+      message: 'Token refreshed successfully',
     };
   }
 }

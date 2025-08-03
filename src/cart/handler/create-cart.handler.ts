@@ -88,7 +88,7 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
         await this.cartItemRepository.save(newItem);
       }
 
-      return { message: 'Cart updated successfully' };
+      return { message: 'Cart Created successfully' };
     } catch (error) {
       throw new HttpException(
         `Failed to update cart: ${error.message}`,

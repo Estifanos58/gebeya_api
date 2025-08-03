@@ -19,7 +19,7 @@ export class GetAllStoreHandler implements IQueryHandler<GetAllStoreQuery>{
             if(!store) throw new HttpException({ message: "Stores Not Found"}, HttpStatus.NOT_FOUND)
 
             return {
-                message: "Stores Found",
+                message: "Returns all stores",
                 data: store
             }
         } catch (error) {

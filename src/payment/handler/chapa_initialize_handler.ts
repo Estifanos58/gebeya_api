@@ -111,7 +111,7 @@ export class ChapaInitializePaymentHandler
       await this.paymentRepository.save(payment);
 
       return {
-        message: 'Payment initialized',
+        message: 'Payment initialization successful',
         checkout_url: response.data?.data?.checkout_url,
         reference,
       };

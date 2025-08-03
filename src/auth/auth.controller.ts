@@ -13,7 +13,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GetUserQuery } from './queries/get-user-query';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { UserRole } from '@/entities';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -34,6 +34,11 @@ export class AuthController {
     // Sign Up
 
     @Post('signup')
+    @ApiResponse({
+        status: 201,
+        description: 'User created successfully',
+        type: CreateUserDto
+    })
     async signUp(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
         // Logic for user registration
         const user = await this.commandBus.execute(new CreateUserCommand(
@@ -53,6 +58,11 @@ export class AuthController {
     }
 
     @Post('login')
+    @ApiResponse({
+        status: 200,
+        description: 'User logged in successfully',
+        type: loginDto
+    })
     async login(@Body() loginDto: loginDto, @Res() res: Response) {
         // Logic for user login
         const user = await this.commandBus.execute(new LoginUserCommand(
@@ -64,6 +74,11 @@ export class AuthController {
     }
 
     @Post('verify-otp')
+    @ApiResponse({
+        status: 200,
+        description: 'OTP verified successfully',
+        type: Object // Adjust the type as per your response structure
+    })
     async verifyOtp(@Body() body: {otp: number}, @Req() req: Request, @Res() res: Response) {
         const { otp } = body;
         if(!otp || typeof otp !== 'number' || otp.toString().length !== 6) {
@@ -76,6 +91,11 @@ export class AuthController {
     }
 
     @Post('forgot-password')
+    @ApiResponse({
+        status: 200,
+        description: 'Password reset email sent successfully',
+        type: Object // Adjust the type as per your response structure
+    })
     async forgotPassword(@Body() body: ForgotPasswordDto, @Res() res: Response) {
         const {email} = body;
         const emailSent = await this.commandBus.execute(new ForgotPasswordCommand(email));
@@ -84,6 +104,11 @@ export class AuthController {
     }
 
     @Post('reset-password')
+    @ApiResponse({
+        status: 200,
+        description: 'Password reset successfully',
+        type: ResetPasswordDto // Adjust the type as per your response structure
+    })
     async resetPassword(@Query('token') token: string, @Query('email') email: string, @Body() body: ResetPasswordDto, @Res() res: Response) {
         // Logic to reset password using the token and email
         if(!token || !email) {
@@ -98,6 +123,11 @@ export class AuthController {
     }
 
     @Get("refresh-token")
+    @ApiResponse({
+        status: 200,
+        description: 'Token refreshed successfully',
+        type: Object // Adjust the type as per your response structure
+    })
     async refreshToken(@Req() req: Request, @Res() res: Response){
         const user = await this.commandBus.execute(new RefreshTokenCommand(req, res))
 
@@ -105,6 +135,11 @@ export class AuthController {
     }
 
     @Get("me")
+    @ApiResponse({
+        status: 200,
+        description: 'User data retrieved successfully',
+        type: Object // Adjust the type as per your response structure
+    })
     async getUserData(@Req() req: Request, @Res() res: Response){
         const user = await this.queryBus.execute(new GetUserQuery(req.user))
         res.status(200).json({...user});

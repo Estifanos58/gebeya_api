@@ -12,7 +12,7 @@ export class CreateCategoryHandler implements ICommandHandler<CreateCategoryComm
         private readonly categoryRepository: Repository<Category>,
     ) {}
 
-    async execute(command: CreateCategoryCommand): Promise<Category> {
+    async execute(command: CreateCategoryCommand): Promise<any> {
         const { name, description } = command;
 
         const existingCategory = await this.categoryRepository.findOne({ where: { name } });
@@ -26,6 +26,11 @@ export class CreateCategoryHandler implements ICommandHandler<CreateCategoryComm
             description,
         });
 
-        return await this.categoryRepository.save(category);
+        await this.categoryRepository.save(category);
+
+        return {
+            message: "Category created successfully",
+            data: category
+        }
     }
 }

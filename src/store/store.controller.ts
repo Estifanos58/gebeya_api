@@ -19,6 +19,7 @@ import { GetAllStoreQuery } from './query/get-all-stores.query';
 import { GetStoreQuery } from './query/get-store.query';
 import { CreateCategoryDto } from './dto/createCategory.dto';
 import { CreateCategoryCommand } from './command/createCategory.command';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('store')
 @Roles([UserRole.MERCHANT, UserRole.ADMIN]) // Example roles, adjust as necessary
@@ -29,6 +30,10 @@ export class StoreController {
   ) {}
 
   @Post()
+  @ApiResponse({
+    status: 201,
+    description: 'Store created successfully',
+  })
   async createStore(
     @Body() body: CreateStoreDto,
     @Req() req: Request,
@@ -47,12 +52,20 @@ export class StoreController {
   }
 
   @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'Returns all stores',
+  })
   async findAll(@Req() req: Request, @Res() res: Response) {
     const store = await this.queryBus.execute(new GetAllStoreQuery());
     return res.status(200).json({ ...store });
   }
 
   @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns a specific store by ID',
+  })
   async findOne(
     @Param('id') id: string,
     @Req() req: Request,
@@ -64,6 +77,10 @@ export class StoreController {
   }
 
   @Delete(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Store deleted successfully',
+  })
   async deleteStore(
     @Param('id') id: string,
     @Req() req: Request,
@@ -78,6 +95,10 @@ export class StoreController {
 
   @Roles([UserRole.MERCHANT])
   @Post('category')
+  @ApiResponse({
+    status: 201,
+    description: 'Category created successfully',
+  })
   async createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
     @Req() req: Request,

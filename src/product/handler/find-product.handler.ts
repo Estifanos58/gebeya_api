@@ -30,7 +30,7 @@ export class FindProductHandler implements IQueryHandler<FindProductQuery> {
         );
 
       return {
-        message: 'Product found successfully',
+        message: 'Retrieve a product by ID',
         data: product,
       };
     } catch (error) {

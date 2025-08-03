@@ -37,6 +37,10 @@ export class GetStoreHandler implements IQueryHandler<GetStoreQuery> {
             throw new HttpException({ message: "Store Not Found" }, HttpStatus.NOT_FOUND);
         }
 
-        return store;
+        return {
+            message: "Returns a specific store by ID",
+            data: store
+        }
+            ;
     }
 }

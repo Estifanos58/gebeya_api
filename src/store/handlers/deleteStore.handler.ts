@@ -21,7 +21,7 @@ export class DeleteStoreHandler implements ICommandHandler<DeleteStoreCommand>{
         await this.storeRepo.delete({id}) 
 
         return {
-            message: "Store deleted"
+            message: "Store deleted successfully"
         }
     }
 }

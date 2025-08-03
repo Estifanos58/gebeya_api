@@ -5,12 +5,17 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ChapaInitializePaymentCommand } from './command/chapa_initialize_commannd';
 import { ChapaWebhookCommand } from './command/chapa_webhook_command';
 import { ChapaVerifyCommand } from './command/chapa_verify_command';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post('chapa/initialize')
+  @ApiResponse({
+    status: 200,
+    description: 'Payment initialization successful',
+  })
   async initializePayment(
     @Body() body: InitializePaymentDto,
     @Req() req: Request,
@@ -28,6 +33,10 @@ export class PaymentController {
   }
 
   @Post('chapa/webhook')
+  @ApiResponse({
+    status: 200,
+    description: 'Webhook processed successfully',
+  })
   async handleWebhook(@Req() req: Request, @Res() res: Response) {
   const { tx_ref, status } = req.body;
     const webhook = await this.commandBus.execute(new ChapaWebhookCommand(tx_ref, status));
@@ -36,6 +45,10 @@ export class PaymentController {
   }
 
   @Post('chapa/verify')
+  @ApiResponse({
+    status: 200,
+    description: 'Payment verification successful',
+  })
   async verifyPayment(
     @Body() body: { tx_ref: string },
     @Req() req: Request,

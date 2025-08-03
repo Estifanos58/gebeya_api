@@ -8,6 +8,7 @@ import { UpdateStoreCommentDto } from "./dto/updateStoreCommentDto";
 import { DeleteCommentCommand } from "./command/deleteComment.command";
 import { CreateProductCommentDto } from "./dto/createProductCommentDto";
 import { CreateProductCommentCommand } from "./command/createProductComment.command";
+import { ApiResponse } from "@nestjs/swagger";
 
 @Controller('comment')
 export class CommentController {
@@ -17,6 +18,11 @@ export class CommentController {
     ){}
 
     @Post('store/:id')
+    @ApiResponse({
+        status: 201,
+        description: 'Comment Added',
+        type: createStoreCommentDto
+    })
     async storeComment(
         @Param("id") id: string,
         @Body() createComment: createStoreCommentDto,
@@ -31,6 +37,11 @@ export class CommentController {
     }
 
     @Patch('store/:id')
+    @ApiResponse({
+        status: 200,
+        description: 'Comment updated successfully',
+        type: UpdateStoreCommentDto
+    })
     async updateStoreComment(
         @Param("id") id: string,
         @Body() updateComment: UpdateStoreCommentDto, // Assuming you have a DTO for this
@@ -47,6 +58,11 @@ export class CommentController {
     }
 
     @Delete('/:commentId')
+    @ApiResponse({
+        status: 200,
+        description: 'Comment deleted successfully',
+        type: String
+    })
     async deleteStoreComment(
         @Param("commentId") commentId: string,
         @Req() req: Request,
@@ -60,6 +76,11 @@ export class CommentController {
     }
 
     @Post('product/:productId')
+    @ApiResponse({
+        status: 201,
+        description: 'Product comment added successfully',
+        type: CreateProductCommentDto
+    })
     async createProductComment(
         @Param("productId") productId: string,
         @Body() createReviewDto: CreateProductCommentDto,

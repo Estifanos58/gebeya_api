@@ -89,7 +89,7 @@ export class ChapaVerifyHandler implements ICommandHandler<ChapaVerifyCommand> {
     }
 
     return {
-        message: "Verification Complete"
+        message: "Payment verification successful"
     }
   }
 }
