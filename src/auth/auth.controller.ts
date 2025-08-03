@@ -13,6 +13,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GetUserQuery } from './queries/get-user-query';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
 import { UserRole } from '@/entities';
+import { ApiTags } from '@nestjs/swagger';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
@@ -23,6 +24,7 @@ declare module 'express' {
     }
 }
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
     constructor( 

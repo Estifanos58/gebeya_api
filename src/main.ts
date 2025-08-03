@@ -7,7 +7,7 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const options = new DocumentBuilder()
-    .setTitle('Your API Title')
+    .setTitle('GEBEYA Multi Vender API')
     .setDescription('Your API description')
     .setVersion('1.0')
     .addServer('http://localhost:3000/', 'Local environment')
