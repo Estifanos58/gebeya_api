@@ -39,7 +39,7 @@ export class AuthController {
         description: 'User created successfully',
         type: CreateUserDto
     })
-    async signUp(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
+    async signUp(@Body() createUserDto: CreateUserDto, @Req() req: Request ,@Res() res: Response) {
         // Logic for user registration
         const user = await this.commandBus.execute(new CreateUserCommand(
             createUserDto.email,
@@ -51,6 +51,7 @@ export class AuthController {
             createUserDto.address,
             createUserDto.profilePicture,
             createUserDto.age,
+            req,
             res
         ))
        

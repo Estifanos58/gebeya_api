@@ -1,11 +1,12 @@
-import { Body, Controller, Get, Post, Query, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Request, Response } from 'express';
 import { CreateOrderCommand } from './command/create_order.command';
 import { CreateOrderDto } from './dto/create_order.dto';
 import { GetOrdersQuery } from './query/get_orders.query';
-import { OrderStatus } from '@/entities';
+import { OrderStatus, Store } from '@/entities';
 import { ApiResponse } from '@nestjs/swagger';
+import { GetStoreOrdersQuery } from './query/get_store_orders.query';
 
 @Controller('order')
 export class OrderController {
@@ -46,5 +47,24 @@ export class OrderController {
     const userId = req.userId!;
     const orders = await this.commandBus.execute(new GetOrdersQuery(userId, status));
     return res.status(200).json(orders);
+  }
+
+  @Get('/:storeId')
+  @ApiResponse({
+    status: 200,
+    description: 'Store orders retrieved successfully',
+  })
+  async getStoreOrder(
+    @Param('storeId') storeId: Store['id'],
+    @Query('status') status: OrderStatus | undefined,
+    @Req() req: Request,
+    @Res() res: Response,
+  ){
+    const userId = req.userId!;
+    const orders = await this.commandBus.execute(new GetStoreOrdersQuery(userId, storeId, status));
+    return {
+      message: 'Orders retrieved successfully',
+      data: orders,
+    };
   }
 }

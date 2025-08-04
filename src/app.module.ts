@@ -18,7 +18,8 @@ import {
   OrderItem,
   Credentials,
   Store,
-  Comment
+  Comment,
+  ActivityLog
 } from './entities';
 import { EntityModule } from './entities/entity.module';
 import { ThrottlerModule,  ThrottlerGuard } from "@nestjs/throttler"
@@ -30,6 +31,7 @@ import { AuthenticateMiddleware } from './middleware/authenticate.middleware';
 import { PaymentModule } from './payment/payment.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { CommentModule } from './comment/comment.module';
+import { ActivityLogModule } from './log/activityLog.module';
 
 @Module({
   imports: [
@@ -59,7 +61,8 @@ import { CommentModule } from './comment/comment.module';
               Category,
               Credentials,
               Store,
-              Comment
+              Comment,
+              ActivityLog
             ],
             synchronize: true, // Set to false in production
           }),
@@ -74,6 +77,7 @@ import { CommentModule } from './comment/comment.module';
     ProductModule,
     PaymentModule,
     CommentModule,
+    ActivityLogModule,
     ThrottlerModule.forRoot([{
       name: "short", 
       ttl: 1000,

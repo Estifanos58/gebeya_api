@@ -12,8 +12,8 @@ import {
   Store,
   Comment,
   Order,
-  OrderItem
-
+  OrderItem,
+  ActivityLog
 } from './index';
 
 @Module({
@@ -30,7 +30,8 @@ import {
       Store,
       Comment,
       Order,
-      OrderItem
+      OrderItem,
+      ActivityLog
     ]),
   ],
   exports:[TypeOrmModule]
