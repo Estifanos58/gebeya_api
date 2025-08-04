@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, CreateDat
 import { User } from './user';
 import { OrderItem } from './order_item';
 import { Payment } from './payment';
+import { Store } from './store';
 
 export enum OrderStatus{
     PLACED = 'placed',
@@ -42,6 +43,9 @@ export class Order {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(()=> Store, store => store.orders, { eager: true })
+  store: Store
 
   @OneToMany(() => OrderItem, orderItem => orderItem.order, { cascade: true})
   items: OrderItem[];

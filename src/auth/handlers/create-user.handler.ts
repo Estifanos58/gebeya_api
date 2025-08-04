@@ -9,6 +9,8 @@ import { generateOtp } from 'src/utils/generateOtp';
 import { generateJWTToken, storeTokenInCookie } from 'src/utils/generateToken';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserRegisterEvent } from '../event/user_register.event';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -17,6 +19,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     @InjectRepository(Credentials)
     private readonly credential: Repository<Credentials>,
     private readonly eventEmitter: EventEmitter2,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<any> {
@@ -27,6 +30,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       firstName,
       lastName,
       role,
+      req,
       res,
     } = command;
 
@@ -92,6 +96,13 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         ),
       );
 
+      this.activityLogService.info(
+        'New User Registered',
+        'User/Registration',
+        user.email,
+        user.role,
+        { userId: user.id },
+      );
       // Exclude password from the response
       const { ...userWithoutPassword } = user;
 
@@ -100,10 +111,14 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
         data: userWithoutPassword,
       };
     } catch (error) {
-      throw new HttpException(
-        { message: 'Error creating user', error: error.message },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+
+      logAndThrowInternalServerError(
+        error,
+        'CreateUserHandler',
+        'User/Registration',
+        this.activityLogService,
+        {ip:req?.ip,email}, // Actor info can be adjusted as needed
+      )
     }
   }
 }

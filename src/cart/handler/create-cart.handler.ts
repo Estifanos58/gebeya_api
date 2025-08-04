@@ -2,8 +2,9 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateCartCommand } from '../command/create-cart.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cart, CartItem, ProductSkus } from '@/entities';
+import { Cart, CartItem, ProductSkus, User } from '@/entities';
 import { Repository } from 'typeorm';
+import { ActivityLogService } from '@/log/activityLog.service';
 
 @CommandHandler(CreateCartCommand)
 export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
@@ -16,11 +17,14 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
 
     @InjectRepository(ProductSkus)
     private readonly productSkusRepository: Repository<ProductSkus>,
+    private readonly activityLogService: ActivityLogService
   ) {}
 
   async execute(command: CreateCartCommand): Promise<any> {
     const { userId, productSkuId, quantity } = command;
 
+    let currentUser: User | null = null;
+    
     try {
       let cart = await this.cartRepository.findOne({
         where: { user: { id: userId } },

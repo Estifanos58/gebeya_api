@@ -6,6 +6,8 @@ import { In, Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { generateUniqueToken } from 'src/utils/generateOtp';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(ForgotPasswordCommand)
 export class ForgotPasswordHandler
@@ -13,14 +15,17 @@ export class ForgotPasswordHandler
 {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @InjectRepository(Credentials) private readonly credential: Repository<Credentials>,
+    @InjectRepository(Credentials)
+    private readonly credential: Repository<Credentials>,
     private readonly eventEmitter: EventEmitter2,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: ForgotPasswordCommand): Promise<any> {
-    try {
-      const { email } = command;
+    const { email } = command;
 
+    let currentUser: User | null = null;
+    try {
       // Here you would typically find the user by email and update their password
       const user = await this.userRepo.findOne({ where: { email } });
       if (!user) {
@@ -29,10 +34,21 @@ export class ForgotPasswordHandler
           HttpStatus.NOT_FOUND,
         );
       }
+
+      currentUser = user;
       // we will generate a unique token for the user
       const temporaryToken = generateUniqueToken();
-      const credentials = await this.credential.findOne({ where: { user: { id: user.id } } });
+      const credentials = await this.credential.findOne({
+        where: { user: { id: user.id } },
+      });
       if (!credentials) {
+        this.activityLogService.error(
+          `Creadential Not Found For User with email: ${user.email}`,
+          'Auth/ForgotPassword',
+          user.email,
+          user.role,
+          { userId: user.id },
+        );
         throw new HttpException(
           { message: 'Credentials not found for the user' },
           HttpStatus.NOT_FOUND,
@@ -48,18 +64,21 @@ export class ForgotPasswordHandler
       this.eventEmitter.emit('user.passwordResetRequested', {
         user: user,
         temporaryToken: temporaryToken,
-        expiresAt: credentials.tokenExpiresAt.toLocaleString()
+        expiresAt: credentials.tokenExpiresAt.toLocaleString(),
       });
-
 
       return {
         message: 'Password reset email sent successfully',
       };
     } catch (error) {
-      throw new HttpException(
-        { message: error.message },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      // Log the error and throw an internal server error
+      logAndThrowInternalServerError(
+        error,
+        'ForgotPasswordHandler',
+        'Auth/ForgotPassword',
+        this.activityLogService,
+        { userId: currentUser?.id, role: currentUser?.role, email: currentUser?.email }, // Actor info can be adjusted as needed
+      )
     }
   }
 }

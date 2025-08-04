@@ -3,10 +3,13 @@ import { Injectable } from "@nestjs/common";
 import { OnEvent } from "@nestjs/event-emitter";
 import { WELCOME_OTP_TEMPLATE } from "@/utils/templates";
 import { UserRegisterEvent } from "./user_register.event";
+import { ActivityLogService } from "@/log/activityLog.service";
 
 @Injectable()
 export class UserRegisterHandler {
-  constructor(private readonly mailService: MailService) {}
+  constructor(
+    private readonly mailService: MailService,
+  ) {}
 
   @OnEvent("user.registered")
   async handleUserRegistration(event: UserRegisterEvent) {

@@ -3,6 +3,7 @@ import { User } from "./user";
 import { Product } from "./product";
 import { Comment } from "./comment";
 import { Payment } from "./payment";
+import { Order } from "./order";
 
 @Entity({name: "store"})
 export class Store {
@@ -31,9 +32,11 @@ export class Store {
     @Column({name: "is_verified", type: "boolean" ,default: false})
     isVerified: boolean;
 
-
     @OneToMany(()=> Payment, payment => payment.store, { nullable: true })
     payments: Payment[];
+
+    @OneToMany(()=> Order, order => order.store, { nullable: true })
+    orders: Order[];
 
 
     @Column({name: "created_at", type: "timestamp" , default: () => "CURRENT_TIMESTAMP" })

@@ -6,6 +6,8 @@ import { Credentials, User } from '@/entities';
 import { Repository } from 'typeorm';
 import { hashedPassword } from 'src/utils/hashedPassword';
 import { PASSWROD_RESET_SUCCESS_TEMPLATE } from 'src/utils/templates';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler
@@ -13,14 +15,19 @@ export class ResetPasswordHandler
 {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @InjectRepository(Credentials) private readonly credential: Repository<Credentials>,
+    @InjectRepository(Credentials)
+    private readonly credential: Repository<Credentials>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: ResetPasswordCommand): Promise<any> {
     const { token, email, newPassword, res } = command;
+
+    let currentUser: User | null = null;
+
     try {
       const user = await this.userRepo.findOne({
-        where: { email},
+        where: { email },
       });
 
       if (!user) {
@@ -29,15 +36,30 @@ export class ResetPasswordHandler
           HttpStatus.UNAUTHORIZED,
         );
       }
+      currentUser = user;
+      const creadentials = await this.credential.findOne({
+        where: { user: { id: user.id }, temporaryToken: token },
+      });
 
-      const creadentials = await this.credential.findOne({where: {user: {id: user.id}, temporaryToken: token}});
-
-      if(!creadentials) {
-        throw new HttpException({ message: "Credentials For this User Not Found" }, HttpStatus.UNAUTHORIZED);
+      if (!creadentials) {
+        this.activityLogService.error(
+          `Creadential Not Found For User with email: ${user.email}`,
+          'Auth/ResetPassword',
+          user.email,
+          user.role,
+          { userId: user.id },
+        );
+        throw new HttpException(
+          { message: 'Credentials For this User Not Found' },
+          HttpStatus.UNAUTHORIZED,
+        );
       }
 
       // Check if the token is still valid
-      if (creadentials?.tokenExpiresAt && creadentials?.tokenExpiresAt < new Date()) {
+      if (
+        creadentials?.tokenExpiresAt &&
+        creadentials?.tokenExpiresAt < new Date()
+      ) {
         throw new HttpException(
           { message: 'Token has expired' },
           HttpStatus.UNAUTHORIZED,
@@ -67,17 +89,28 @@ export class ResetPasswordHandler
         },
       };
 
-      const {...userWithoutSensitiveData } = user
-      
+      const { ...userWithoutSensitiveData } = user;
+
+      this.activityLogService.info(
+        'User Has Reset His/Her Password',
+        'Auth/ResetPassword',
+        user.email,
+        user.role,
+        { userId: user.id },
+      );
+
       return {
-            message: 'Password reset successfully',
-            data: userWithoutSensitiveData
-        }
+        message: 'Password reset successfully',
+        data: userWithoutSensitiveData,
+      };
     } catch (error) {
-      // Handle errors appropriately, e.g., user not found, token expired, etc.
-      throw new HttpException(
-        { message: error.message },
-        HttpStatus.INTERNAL_SERVER_ERROR,
+      // Log the error and throw an internal server error
+      logAndThrowInternalServerError(
+        error,
+        'ResetPasswordHandler',
+        'Auth/ResetPassword',
+        this.activityLogService,
+        { userId: currentUser?.id, role: currentUser?.role, email: currentUser?.email }, 
       );
     }
   }

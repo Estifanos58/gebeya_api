@@ -15,6 +15,7 @@ import { GetUserHandler } from './handlers/get-user.handler';
 import { RefreshTokenHandler } from './handlers/refresh-token.handler';
 import { UserRegisterHandler } from './event/user_register.handler';
 import { UserPasswordResetHandler } from './event/user_password.handler';
+import { ActivityLogModule } from '@/log/activityLog.module';
 
 const CommandHandlers = [CreateUserHandler, ForgotPasswordHandler, LoginUserHandler, VerifyOtpHandler, ResetPasswordHandler, RefreshTokenHandler];
 const QueryHandlers = [GetUserHandler];
@@ -23,7 +24,8 @@ const QueryHandlers = [GetUserHandler];
     // TypeOrmModule.forFeature([User]), // Assuming User entity is imported from the correct path
     EntityModule,
     CqrsModule,
-    MailModule
+    MailModule,
+    ActivityLogModule
   ],
   controllers: [AuthController],
   providers: [...CommandHandlers, ...QueryHandlers, UserRegisterHandler, UserPasswordResetHandler],

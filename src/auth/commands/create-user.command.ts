@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { UserRole } from "@/entities";
 
 export class CreateUserCommand {
@@ -12,6 +12,7 @@ export class CreateUserCommand {
         public readonly address?: string | null,
         public readonly profilePicture?: string | null,
         public readonly age?: number | null,
+        public readonly req?: Request,
         public readonly res?: Response
     ) {}
 }
