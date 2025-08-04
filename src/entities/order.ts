@@ -15,7 +15,7 @@ export enum OrderStatus{
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn("uuid", { name: 'order_id' })
-  id: number;
+  id: string;
 
   @ManyToOne(() => User, user => user.orders)
   user: User;

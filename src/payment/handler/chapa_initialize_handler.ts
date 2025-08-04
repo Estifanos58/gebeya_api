@@ -13,6 +13,8 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { generateReference } from '@/utils/generalFunctions';
 import { HttpService } from '@nestjs/axios';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(ChapaInitializePaymentCommand)
 export class ChapaInitializePaymentHandler
@@ -29,6 +31,7 @@ export class ChapaInitializePaymentHandler
     private readonly paymentRepository: Repository<Payment>,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: ChapaInitializePaymentCommand): Promise<any> {
@@ -116,11 +119,19 @@ export class ChapaInitializePaymentHandler
         reference,
       };
     } catch (error) {
-      console.error('Chapa payment initialization error:', error);
-      throw new HttpException(
-        error?.response?.data?.message || 'Payment initialization failed',
-        HttpStatus.BAD_REQUEST,
-      );
+      logAndThrowInternalServerError(
+        error,
+        'ChapaInitializePaymentHandler',
+        'Chapa Payment Initialization',
+        this.activityLogService,
+        {
+          userId: user.id,
+          email: user.email,
+          role: user.role,
+          storeId: store.id,
+          orderId: order.id,
+        },
+      )
     }
   }
 }

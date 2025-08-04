@@ -9,6 +9,7 @@ import { ConfigModule } from "@nestjs/config";
 import { HttpModule } from "@nestjs/axios";
 import { MailModule } from "@/mail/mail.module";
 import { ChapaVerifyHandler } from "./handler/chapa_verify_handler";
+import { ActivityLogModule } from "@/log/activityLog.module";
 
 const CommandHandlers = [ChapaInitializePaymentHandler, ChapaWebhookHandler, ChapaVerifyHandler];
 const QueryHandlers= []
@@ -19,7 +20,8 @@ const QueryHandlers= []
         EntityModule,
         ConfigModule,
         HttpModule,
-        MailModule
+        MailModule,
+        ActivityLogModule
     ],
     controllers: [PaymentController],
     providers: [...CommandHandlers, ...QueryHandlers, HandlePaymentEvent],

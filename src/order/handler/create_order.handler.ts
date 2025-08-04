@@ -8,9 +8,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrderItem } from '@/entities/order_item';
-import { Order } from '@/entities/order';
+import { Order, OrderStatus } from '@/entities/order';
 import { calculateCartTotal } from '@/utils/generalFunctions';
 import { randomUUID } from 'crypto';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(CreateOrderCommand)
 export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
@@ -21,6 +23,7 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     private readonly orderItemRepo: Repository<OrderItem>,
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<any> {
@@ -68,13 +71,39 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
       // Delete cart — cartItems will be deleted automatically via cascade
       await this.cartRepo.delete(cart.id);
 
+      this.activityLogService.info(
+        'Order Created ',
+        'Order/Creation',
+        user?.email,
+        user?.role,
+        {
+          userId: user.id,
+          storeId: savedOrder.store.id,
+          orderId: savedOrder.id,
+          destination: orderDeliveryAddress,
+          contactInfo: orderContactInfo,
+          orderNumber: order.orderNumber,
+          orderStatus: order.status 
+        },
+      )
+
       return {
         message: 'Order created successfully',
         data: savedOrder,
       };
     } catch (error) {
-      console.error('Order creation failed:', error);
-      throw new InternalServerErrorException(error.message);
+      logAndThrowInternalServerError(
+        error,
+        'CreateOrderHandler',
+        'Order/Creation',
+        this.activityLogService,
+        {
+          email: user?.email,
+          role: user?.role,
+          userId: user?.id,
+          cartId: cartId,
+        },  
+      )
     }
   }
 }

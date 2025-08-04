@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from '@/entities';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { GetStoreOrdersQuery } from '../query/get_store_orders.query';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 
 @CommandHandler(GetStoreOrdersQuery)
@@ -14,6 +16,7 @@ export class GetOrdersHandler implements IQueryHandler<GetStoreOrdersQuery> {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
   async execute(query: GetStoreOrdersQuery): Promise<any> {
     const { userId, storeId, status } = query;
@@ -38,8 +41,16 @@ export class GetOrdersHandler implements IQueryHandler<GetStoreOrdersQuery> {
         data: orders,
       };
     } catch (error) {
-      console.error('Store Orders retrieval failed:', error)
-      throw new InternalServerErrorException(error.message);
+      logAndThrowInternalServerError(
+        error,
+        'GetStoreOrdersHandler',
+        'GetStoreOrdersQuery',
+        this.activityLogService,
+        {
+          userId,
+          storeId
+        }
+      )
     }
   }
 }
