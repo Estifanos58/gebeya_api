@@ -4,13 +4,16 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Store } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import { ActivityLogService } from "@/log/activityLog.service";
+import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
 @QueryHandler(GetAllStoreQuery)
 export class GetAllStoreHandler implements IQueryHandler<GetAllStoreQuery>{
 
     constructor(
         @InjectRepository(Store)
-        private readonly storeRepo: Repository<Store>
+        private readonly storeRepo: Repository<Store>,
+        private readonly activityLogService: ActivityLogService
     ){}
     async execute(query: GetAllStoreQuery): Promise<any> {
         try {
@@ -23,7 +26,12 @@ export class GetAllStoreHandler implements IQueryHandler<GetAllStoreQuery>{
                 data: store
             }
         } catch (error) {
-            throw new HttpException({ message: "Server Issue"}, HttpStatus.INTERNAL_SERVER_ERROR)
+           logAndThrowInternalServerError(
+            error,
+            'GetAllStoreHandler',
+            'Get All Stores Query',
+            this.activityLogService
+           )
         }
     }
 }

@@ -8,13 +8,14 @@ import { UpdateProductHandler } from './handler/update-product.handler';
 import { FindProductHandler } from './handler/find-product.handler';
 import { GetProductsHandler } from './handler/get-products.handler';
 import { DeleteProductHandler } from './handler/delete-product.handler';
+import { ActivityLogModule } from '@/log/activityLog.module';
 
 
 const CommandHandlers = [CreateProductHandler, UpdateProductHandler, DeleteProductHandler];
 const QueryHandlers = [FindProductHandler, GetProductsHandler];
 
 @Module({
-  imports: [EntityModule, CqrsModule,],
+  imports: [EntityModule, CqrsModule,ActivityLogModule],
   controllers: [ProductController],
   providers: [...CommandHandlers, ...QueryHandlers],
 })

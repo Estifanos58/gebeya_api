@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Comment, Product } from '@/entities';
 import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 
 @QueryHandler(GetProductsQuery)
@@ -11,6 +13,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(query: GetProductsQuery): Promise<any> {
@@ -113,11 +116,15 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
         },
       };
     } catch (error) {
-      console.log("Error retrieving products:", error);
-      throw new HttpException(
-        { message: 'Failed to retrieve products' },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      logAndThrowInternalServerError(
+        error,
+        'GetProductsHandler',
+        'Product/Retrieval',
+        this.activityLogService,
+        {
+          storeId,
+        },
+      )
     }
   }
 }

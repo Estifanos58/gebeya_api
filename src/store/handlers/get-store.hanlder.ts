@@ -1,46 +1,62 @@
-import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { GetStoreQuery } from "../query/get-store.query";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Store } from "@/entities";
-import { Repository } from "typeorm";
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import { GetStoreQuery } from '../query/get-store.query';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Store } from '@/entities';
+import { Repository } from 'typeorm';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @QueryHandler(GetStoreQuery)
 export class GetStoreHandler implements IQueryHandler<GetStoreQuery> {
+  constructor(
+    @InjectRepository(Store)
+    private readonly storeRepo: Repository<Store>,
+    private readonly activityLogService: ActivityLogService,
+  ) {}
 
-    constructor(
-        @InjectRepository(Store)
-        private readonly storeRepo: Repository<Store>
-    ) {}
+  async execute(query: GetStoreQuery): Promise<any> {
+    const { storeId } = query;
 
-    async execute(query: GetStoreQuery): Promise<any> {
-        const { storeId } = query;
+    // console.log("storeId: ", storeId);
 
-        // console.log("storeId: ", storeId);
+    try {
+      const relations = [
+        'user',
+        'product',
+        'product.skus',
+        'product.category',
+        'comment',
+        'comment.user',
+        // Add more relations here if needed, like orders, ratings, etc.
+      ];
 
-        const relations = [
-            'user',
-            'product',
-            'product.skus',
-            'product.category',
-            'comment',
-            'comment.user',
-            // Add more relations here if needed, like orders, ratings, etc.
-        ];
+      const store = await this.storeRepo.findOne({
+        where: { id: storeId },
+        relations,
+      });
 
-        const store = await this.storeRepo.findOne({
-            where: { id: storeId },
-            relations,
-        });
+      if (!store) {
+        throw new HttpException(
+          { message: 'Store Not Found' },
+          HttpStatus.NOT_FOUND,
+        );
+      }
 
-        if (!store) {
-            throw new HttpException({ message: "Store Not Found" }, HttpStatus.NOT_FOUND);
-        }
-
-        return {
-            message: "Returns a specific store by ID",
-            data: store
-        }
-            ;
+      return {
+        message: 'Returns a specific store by ID',
+        data: store,
+      };
+    } catch (error) {
+        logAndThrowInternalServerError(
+            error,
+            'GetStoreHandler',
+            'Get Store Query',
+            this.activityLogService,
+            {
+                storeId
+            }
+        )
     }
+  }
 }

@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateProductCommand } from '../command/updateProduct.command';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler
@@ -18,6 +20,7 @@ export class UpdateProductHandler
     private readonly categoryRepo: Repository<Category>,
     @InjectRepository(ProductSkus)
     private readonly productSkusRepo: Repository<ProductSkus>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: UpdateProductCommand): Promise<any> {
@@ -74,7 +77,16 @@ export class UpdateProductHandler
         };
 
     } catch (error) {
-        throw new HttpException({ message: "Server Error Happened"}, HttpStatus.INTERNAL_SERVER_ERROR);
+        logAndThrowInternalServerError(
+          error,
+          "UpdateProductHandler",
+          "Product/Update",
+          this.activityLogService,
+          {
+            productId: id,
+            userId: userId,
+          },
+        )
     }
   }
 }

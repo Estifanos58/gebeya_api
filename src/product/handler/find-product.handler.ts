@@ -4,17 +4,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from '@/entities';
 import { Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @QueryHandler(FindProductQuery)
 export class FindProductHandler implements IQueryHandler<FindProductQuery> {
   constructor(
-    // Inject necessary services here, e.g., product repository
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(query: FindProductQuery): Promise<any> {
-    // Implement the logic to find a product by its ID
     const { id } = query;
 
     try {
@@ -34,13 +35,15 @@ export class FindProductHandler implements IQueryHandler<FindProductQuery> {
         data: product,
       };
     } catch (error) {
-      throw new HttpException(
-        `Product with ID ${id} not found`,
-        HttpStatus.NOT_FOUND,
-      );
+      logAndThrowInternalServerError(
+        error,
+        "FindProductHandler",
+        "Product/Find",
+        this.activityLogService,
+        {
+          productId: id,
+        },
+      )
     }
-
-    // Example: return await this.productRepository.findById(id);
-    //
   }
 }

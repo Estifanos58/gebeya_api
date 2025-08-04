@@ -8,6 +8,7 @@ import { CreateCategoryHandler } from "./handlers/create-category.handler";
 import { GetAllStoreHandler } from "./handlers/get-all-stores.handler";
 import { GetStoreHandler } from "./handlers/get-store.hanlder";
 import { DeleteStoreHandler } from "./handlers/deleteStore.handler";
+import { ActivityLogModule } from "@/log/activityLog.module";
 
 const CommandHandler = [CreateStoreHandler, CreateCategoryHandler, DeleteStoreHandler];
 const QueryHandler = [GetAllStoreHandler, GetStoreHandler];
@@ -16,7 +17,8 @@ const QueryHandler = [GetAllStoreHandler, GetStoreHandler];
     imports:[
     CqrsModule,
     MailModule,
-    EntityModule
+    EntityModule,
+    ActivityLogModule
     ],
     controllers:[StoreController],
     providers:[...CommandHandler, ...QueryHandler],

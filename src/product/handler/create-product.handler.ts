@@ -3,11 +3,12 @@ import { CreateProductCommand } from "../command/createProduct.command";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Category, Product, ProductSkus, Store } from "@/entities";
 import { Repository } from "typeorm";
-import { HttpException, HttpStatus, Logger } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
+import { ActivityLogService } from "@/log/activityLog.service";
+import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler implements ICommandHandler<CreateProductCommand> {
-  private readonly logger = new Logger(CreateProductHandler.name);
 
   constructor(
     @InjectRepository(Store)
@@ -21,6 +22,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
 
     @InjectRepository(Category)
     private readonly categoryRepo: Repository<Category>,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: CreateProductCommand): Promise<any> {
@@ -66,17 +68,35 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
 
       const savedSkus = await this.productSkusRepo.save(skusToSave);
 
+      this.activityLogService.info(
+        'New Product Added',
+        'Product created successfully',
+        store.user.email,
+        store.user.role,
+        {
+          userId: store.user.id,
+          storeId: store.id,
+          productId: savedProduct.id,
+        }
+      )
+
       return {
         message: "Product created successfully",
         product: savedProduct,
         skus: savedSkus,
       };
     } catch (error) {
-      this.logger.error("Failed to create product", error.stack);
-      throw new HttpException(
-        { message: "Internal Server Error", error: error.message },
-        HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      logAndThrowInternalServerError(
+        error,
+        'CreateProductHandler',
+        'Product/Creation',
+        this.activityLogService,
+        {
+          userId,
+          storeId,
+        }
+      )
+     
     }
   }
 }
