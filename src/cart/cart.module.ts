@@ -7,12 +7,14 @@ import { UpdateCartHandler } from "./handler/update-cart.handler";
 import { GetCartHandler } from "./handler/get-cart.handler";
 import { EntityModule } from "@/entities/entity.module";
 import { CqrsModule } from "@nestjs/cqrs";
+import { ActivityLogModule } from "@/log/activityLog.module";
 
 const CommandHandlers = [DeleteCartItemHandler, DeleteCartHandler, CreateCartHandler, UpdateCartHandler]
 const QueryHandlers = [GetCartHandler]
 @Module({
     imports: [
         EntityModule,
+        ActivityLogModule,
         CqrsModule
     ],
     controllers: [CartController],

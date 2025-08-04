@@ -6,6 +6,7 @@ import { CreateStoreCommentHandler } from './handler/createStoreComment.handler'
 import { UpdateStoreCommentHandler } from './handler/updateStoreComment.handler';
 import { DeleteCommentHandler } from './handler/deleteComment.handler';
 import { CreateProductCommentHandler } from './handler/createProductComment.handler';
+import { ActivityLogModule } from '@/log/activityLog.module';
 
 const CommandHandlers = [
   CreateStoreCommentHandler,
@@ -15,7 +16,7 @@ const CommandHandlers = [
 ];
 
 @Module({
-  imports: [CqrsModule, EntityModule],
+  imports: [CqrsModule, EntityModule, ActivityLogModule],
   controllers: [CommentController],
   providers: [...CommandHandlers],
   exports: [],

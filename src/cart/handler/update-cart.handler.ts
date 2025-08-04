@@ -4,6 +4,8 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Cart, CartItem, ProductSkus } from "@/entities";
+import { ActivityLogService } from "@/log/activityLog.service";
+import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
 @CommandHandler(updateCartCommand)
 export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
@@ -16,6 +18,8 @@ export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
 
     @InjectRepository(ProductSkus)
     private readonly productSkusRepository: Repository<ProductSkus>,
+
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: updateCartCommand): Promise<any> {
@@ -31,7 +35,7 @@ export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
           cart: { user: { id: userId } },
           productSku: { id: productSkuId },
         },
-        relations: ['cart', 'productSku'],
+        relations: ['cart','cart.user', 'productSku'],
       });
 
       if (!cartItem) {
@@ -55,6 +59,17 @@ export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
       }
 
       if (quantity >= storeProduct.quantity) {
+        this.activityLogService.warn(
+          'User Requested Product Quanity Exceeds Available Stock',
+          'Cart/Update',
+          cartItem.cart.user.id,
+          cartItem.cart.user.role,
+          {
+            productSkuId: productSkuId,
+            requestedQuantity: quantity,
+            availableStock: storeProduct.quantity,
+          },
+        )
         throw new HttpException(
           `Requested quantity (${quantity}) exceeds available stock (${storeProduct.quantity})`,
           HttpStatus.BAD_REQUEST
@@ -69,10 +84,13 @@ export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
         data: updatedItem,
       };
     } catch (error) {
-      throw new HttpException(
-        `Failed to update cart: ${error.message}`,
-        error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR
-      );
+      logAndThrowInternalServerError(
+        error,
+        'UpdateCartHandler',
+        'Cart/Update',
+        this.activityLogService,
+        { userId, productSkuId: productSkuId, },
+      )
     }
   }
 }

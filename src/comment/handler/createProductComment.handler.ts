@@ -4,6 +4,8 @@ import { Comment, Product } from "@/entities";
 import { Repository } from "typeorm";
 import { HttpException, HttpStatus, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { CreateProductCommentCommand } from "../command/createProductComment.command";
+import { ActivityLogService } from "@/log/activityLog.service";
+import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
 @CommandHandler(CreateProductCommentCommand)
 export class CreateProductCommentHandler implements ICommandHandler<CreateProductCommentCommand>{
@@ -13,7 +15,8 @@ export class CreateProductCommentHandler implements ICommandHandler<CreateProduc
         private readonly commentRepository: Repository<Comment>,
 
         @InjectRepository(Product)
-        private readonly productRepository: Repository<Product>
+        private readonly productRepository: Repository<Product>,
+        private readonly activityLogService: ActivityLogService
     ){}
 
     async execute(command: CreateProductCommentCommand): Promise<any> {
@@ -36,14 +39,36 @@ export class CreateProductCommentHandler implements ICommandHandler<CreateProduc
                 product
             }) 
 
+            this.activityLogService.info(
+                'New Product Comment Created',
+                'Product/Comment',
+                user.email,
+                user.role,
+                {
+                    userId: user.id,
+                    productId: product.id,
+                    comment: message
+                }
+            )
+
             await this.commentRepository.save(comment);
 
             return {
                 message: "Product comment added successfully"
             }
         } catch (error) {
-            console.error('Error happed at Create Review Handler: ', error.message)
-            throw new InternalServerErrorException("Internal Server Error Happened")
+            logAndThrowInternalServerError(
+                error,
+                'CreateProductCommentHandler',
+                'Product/Comment',
+                this.activityLogService,
+                {
+                    email: user.email,
+                    role: user.role,
+                    productId: productId,
+                    userId: user.id
+                }
+            )
         }
     }
 }
