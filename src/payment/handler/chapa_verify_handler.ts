@@ -8,6 +8,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SuccessfulPaymentEvent } from '../event/successful_payment.event';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(ChapaVerifyCommand)
 export class ChapaVerifyHandler implements ICommandHandler<ChapaVerifyCommand> {
@@ -23,73 +25,89 @@ export class ChapaVerifyHandler implements ICommandHandler<ChapaVerifyCommand> {
     private readonly httpService: HttpService,
 
     private readonly configService: ConfigService,
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: ChapaVerifyCommand): Promise<any> {
     const { tx_ref } = command;
 
-    const payment = await this.paymentRepository.findOne({
-      where: { reference: tx_ref },
-      relations: ['user']
-    });
-    if (!payment) {
-      throw new NotFoundException('Payment with this reference not found');
-    }
+    let currentpayment: Payment | null = null;
 
-    // console.log("Paymetn Found: ", payment);
+    try {
+      const payment = await this.paymentRepository.findOne({
+        where: { reference: tx_ref },
+        relations: ['user'],
+      });
+      if (!payment) {
+        throw new NotFoundException('Payment with this reference not found');
+      }
+      currentpayment = payment;
+      // console.log("Paymetn Found: ", payment);
 
-    const chapaVerifyUrl = this.configService.get<string>('CHAPA_VERIFY_URL');
-    const chapaApiKey = this.configService.get<string>('CHAPA_SECRET_KEY');
+      const chapaVerifyUrl = this.configService.get<string>('CHAPA_VERIFY_URL');
+      const chapaApiKey = this.configService.get<string>('CHAPA_SECRET_KEY');
 
-    const url = `${chapaVerifyUrl}/${tx_ref}`;
-    const response = await this.httpService.axiosRef.get(url, {
-      headers: {
-        Authorization: `Bearer ${chapaApiKey}`,
-      },
-    });
-
-    // console.log("CHAPA Verification Response: ", response.data);
-    if(response.status !== 200 || response.data.status === "failed"){
-        throw new HttpException({
-            message: "Payment Not Commplete",
-            status: response.data.status
-        }, HttpStatus.BAD_REQUEST)
-        
-    }
-
-    if (payment.status === PaymentStatus.PENDING) {
-      payment.status = PaymentStatus.SUCCESS;
-
-      const order = await this.orderRepository.findOne({
-        where: { payment: { id: payment.id } },
+      const url = `${chapaVerifyUrl}/${tx_ref}`;
+      const response = await this.httpService.axiosRef.get(url, {
+        headers: {
+          Authorization: `Bearer ${chapaApiKey}`,
+        },
       });
 
-      if (!order) {
-        throw new NotFoundException(`Order for this payment not found`);
+      // console.log("CHAPA Verification Response: ", response.data);
+      if (response.status !== 200 || response.data.status === 'failed') {
+        throw new HttpException(
+          {
+            message: 'Payment Not Commplete',
+            status: response.data.status,
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       }
-      order.isPaid = true;
 
+      if (payment.status === PaymentStatus.PENDING) {
+        payment.status = PaymentStatus.SUCCESS;
 
-      await Promise.all([
-        this.orderRepository.save(order),
-        this.paymentRepository.save(payment),
-      ])
-      
+        const order = await this.orderRepository.findOne({
+          where: { payment: { id: payment.id } },
+        });
 
-      this.eventEmitter.emit(
-        'payment.success',
-        new SuccessfulPaymentEvent(
-          payment.id,
-          payment.amount,
-          payment.currency,
-          payment.user.id,
-          payment.createdAt,
-        ),
-      );
-    }
+        if (!order) {
+          throw new NotFoundException(`Order for this payment not found`);
+        }
+        order.isPaid = true;
 
-    return {
-        message: "Payment verification successful"
+        await Promise.all([
+          this.orderRepository.save(order),
+          this.paymentRepository.save(payment),
+        ]);
+
+        this.eventEmitter.emit(
+          'payment.success',
+          new SuccessfulPaymentEvent(
+            payment.id,
+            payment.amount,
+            payment.currency,
+            payment.user.id,
+            payment.createdAt,
+          ),
+        );
+      }
+
+      return {
+        message: 'Payment verification successful',
+      };
+    } catch (error) {
+      logAndThrowInternalServerError(
+        error,
+        'ChapaVerifyHandler',
+        'Chapa Verify Handler',
+        this.activityLogService,
+        {
+          paymentId: currentpayment?.id,
+          userId: currentpayment?.user?.id,
+        },
+      )
     }
   }
 }
