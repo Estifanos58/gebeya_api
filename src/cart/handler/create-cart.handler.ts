@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cart, CartItem, ProductSkus, User } from '@/entities';
 import { Repository } from 'typeorm';
 import { ActivityLogService } from '@/log/activityLog.service';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 @CommandHandler(CreateCartCommand)
 export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
@@ -13,18 +14,18 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
     private readonly cartRepository: Repository<Cart>,
 
     @InjectRepository(CartItem)
-    private readonly cartItemRepository: Repository<CartItem>, 
+    private readonly cartItemRepository: Repository<CartItem>,
 
     @InjectRepository(ProductSkus)
     private readonly productSkusRepository: Repository<ProductSkus>,
-    private readonly activityLogService: ActivityLogService
+    private readonly activityLogService: ActivityLogService,
   ) {}
 
   async execute(command: CreateCartCommand): Promise<any> {
     const { userId, productSkuId, quantity } = command;
 
     let currentUser: User | null = null;
-    
+
     try {
       let cart = await this.cartRepository.findOne({
         where: { user: { id: userId } },
@@ -35,14 +36,28 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
         where: { id: productSkuId },
       });
 
-      if(!productSku){
-        throw new HttpException(`Product SKU ${productSkuId} not found`, HttpStatus.NOT_FOUND);
+      if (!productSku) {
+        throw new HttpException(
+          `Product SKU ${productSkuId} not found`,
+          HttpStatus.NOT_FOUND,
+        );
       }
 
-      if(quantity > productSku.quantity) {
+      if (quantity > productSku.quantity) {
+        this.activityLogService.warn(
+          'Insufficient stock for product SKU',
+          'Cart/Creation',
+          userId,
+          cart?.user.role,
+          {
+            productSkuId: productSkuId,
+            requestedQuantity: quantity,
+            availableStock: productSku.quantity,
+          },
+        );
         throw new HttpException(
           `Requested quantity (${quantity}) exceeds available stock (${productSku.quantity})`,
-          HttpStatus.BAD_REQUEST
+          HttpStatus.BAD_REQUEST,
         );
       }
 
@@ -52,15 +67,25 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
           (item) => item.productSku.id === productSkuId,
         );
 
-
         if (existingItem) {
-          // Check if the quantity is above the current stock 
-           if (existingItem.quantity + quantity >= productSku.quantity) {
-              throw new HttpException(
-                `Requested quantity (${quantity}) exceeds available stock (${productSku.quantity})`,
-                HttpStatus.BAD_REQUEST
-              );
-            }
+          // Check if the quantity is above the current stock
+          if (existingItem.quantity + quantity >= productSku.quantity) {
+            this.activityLogService.warn(
+              'Insufficient stock for product SKU',
+              'Cart/Creation',
+              userId,
+              cart?.user.role,
+              {
+                productSkuId: productSkuId,
+                requestedQuantity: quantity,
+                availableStock: productSku.quantity,
+              },
+            );
+            throw new HttpException(
+              `Requested quantity (${quantity}) exceeds available stock (${productSku.quantity})`,
+              HttpStatus.BAD_REQUEST,
+            );
+          }
           existingItem.quantity += quantity;
           await this.cartItemRepository.save(existingItem);
         } else {
@@ -94,10 +119,13 @@ export class CreateCartHandler implements ICommandHandler<CreateCartCommand> {
 
       return { message: 'Cart Created successfully' };
     } catch (error) {
-      throw new HttpException(
-        `Failed to update cart: ${error.message}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      logAndThrowInternalServerError(
+        error,
+        'CreateCartHandler',
+        'Cart/Creation',
+        this.activityLogService,
+        { userId, productSkuId: productSkuId,}, 
+      )
     }
   }
 }

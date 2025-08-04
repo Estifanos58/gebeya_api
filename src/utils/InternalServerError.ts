@@ -19,9 +19,12 @@ export function logAndThrowInternalServerError(
     role?: string;
     storeId?: string;
     productId?: string;
+    productSkuId?: string;
     userId?: string;
     cartId?: string;
+    cartItemId?: string;
     orderId?: string;
+    commentId?: string;
     paymentId?: string;
   },
 ) {
@@ -37,9 +40,12 @@ export function logAndThrowInternalServerError(
       userId: actor?.userId,
       storeId: actor?.storeId,
       productId: actor?.productId,
-      cartId: actor?.cartId,    
+      productSkuId: actor?.productSkuId,
+      cartId: actor?.cartId,  
+      cartItemId: actor?.cartItemId,  
       orderId: actor?.orderId,
       paymentId: actor?.paymentId,
+      commentId: actor?.commentId,
       stack: !isHttpError ? error.stack : undefined,
     },
   );

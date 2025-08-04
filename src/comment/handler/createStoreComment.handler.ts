@@ -4,6 +4,8 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Store, Comment } from "@/entities";
 import { Repository } from "typeorm";
+import { ActivityLogService } from "@/log/activityLog.service";
+import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
 @CommandHandler(CreateStoreCommentCommand)
 export class CreateStoreCommentHandler implements ICommandHandler<CreateStoreCommentCommand>{
@@ -13,7 +15,8 @@ export class CreateStoreCommentHandler implements ICommandHandler<CreateStoreCom
         private readonly storeRepo: Repository<Store>,
 
         @InjectRepository(Comment)
-        private readonly commentRepo: Repository<Comment>
+        private readonly commentRepo: Repository<Comment>,
+        private readonly activityLogService: ActivityLogService
     ){}
 
     async execute(command: CreateStoreCommentCommand): Promise<any> {
@@ -34,6 +37,18 @@ export class CreateStoreCommentHandler implements ICommandHandler<CreateStoreCom
                 review
             })
 
+            this.activityLogService.info(
+                'New Store Comment Created',
+                'Store/Comment',
+                user.email,
+                user.role,
+                {
+                    userId: user.id,
+                    storeId: storeId,
+                    comment: message
+                }
+            )
+
             await this.commentRepo.save(comment)
 
             return {
@@ -41,8 +56,13 @@ export class CreateStoreCommentHandler implements ICommandHandler<CreateStoreCom
                 data: comment
             }
         } catch (error) {
-            console.error("Error in CreateStoreCommentHandler: ", error);
-            throw new HttpException({ message: "Server Issue"}, HttpStatus.INTERNAL_SERVER_ERROR)
+            logAndThrowInternalServerError(
+                error,
+                'CreateStoreCommentHandler',
+                'Store/Comment',
+                this.activityLogService,
+                { email: user.email, role: user.role, storeId}
+            )
         }
     }
 }
