@@ -473,7 +473,7 @@ export const STORE_DISAPPROVED_TEMPLATE = `
 
         <p>We’ve reviewed your store application for <strong>{storeName}</strong> and unfortunately, it has been disapproved at this time.</p>
 
-        <p><strong>Reason:</strong> {disapprovalReason}</p>
+        <p><strong>Reason:</strong> {reason}</p>
 
         <p>If you believe this decision was made in error or you would like to submit additional information, feel free to contact our support team.</p>
 

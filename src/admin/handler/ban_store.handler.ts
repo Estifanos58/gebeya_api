@@ -32,8 +32,8 @@ export class BanStoreHandler implements ICommandHandler<BanStoreCommand> {
       }
 
       store.banned = true;
-      this.eventEmitter.emit('store.banned', new StoreBanEvent(store, reason));
       await this.storeRepository.save(store);
+      this.eventEmitter.emit('store.banned', new StoreBanEvent(store, reason));
       
       this.activityLogService.info(
         'Store has been banned',

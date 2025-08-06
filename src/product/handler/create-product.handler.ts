@@ -42,7 +42,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
         throw new HttpException({ message: "Store is not verified" }, HttpStatus.FORBIDDEN);
       }
 
-      if(!store.banned){
+      if(store.banned){
         throw new HttpException({ message: "Store is banned" }, HttpStatus.FORBIDDEN);
       }
 

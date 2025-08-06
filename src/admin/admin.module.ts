@@ -6,6 +6,7 @@ import { CqrsModule } from "@nestjs/cqrs";
 import { StoreApproveEventHandler } from "./event/store/store_event_handler";
 import { ApproveStoreHandler } from "./handler/approve_store.handler";
 import { BanStoreHandler } from "./handler/ban_store.handler";
+import { AdminController } from "./admin.controller";
 
 
 const CommandHandlers = [ApproveStoreHandler, BanStoreHandler]
@@ -17,7 +18,7 @@ const CommandHandlers = [ApproveStoreHandler, BanStoreHandler]
         ActivityLogModule,
         MailModule
     ],
-    controllers:[],
+    controllers:[AdminController],
     providers:[StoreApproveEventHandler, ...CommandHandlers]
 })
 

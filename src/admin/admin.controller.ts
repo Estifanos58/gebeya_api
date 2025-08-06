@@ -13,29 +13,25 @@ import { BanStoreCommand } from './command/ban_store.command';
 export class AdminController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @Post('store')
+ @Post('store/:storeId')
   async approveStore(
-    @Query('storeId') storeId: string,
+    @Param('storeId') storeId: string,
     @Body() approveStoreDto: ApproveStoreDto,
     @Req() req: Request,
-    @Res() res: Response,
   ): Promise<any> {
-    const store = await this.commandBus.execute(
+    return this.commandBus.execute(
       new ApproveStoreCommand(storeId, approveStoreDto.isApproved, req.user),
     );
-    return res.status(200).json({ ...store });
   }
 
-  @Post('store/ban/:storeId')
+   @Post('store/ban/:storeId')
   async banStore( 
     @Param('storeId') storeId: string,
     @Body() bannedStoreDto: BannedStoreDto,
     @Req() req: Request,
-    @Res() res: Response,
   ){
-    const store = await this.commandBus.execute(
+      return this.commandBus.execute(
       new BanStoreCommand(storeId, bannedStoreDto.reason, req.user),
     );
-    return res.status(200).json({ ...store });
   }
 }
