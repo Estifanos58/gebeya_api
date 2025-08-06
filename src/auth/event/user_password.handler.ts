@@ -13,7 +13,7 @@ export class UserPasswordResetHandler {
     ){}
 
     @OnEvent('user.passwordResetRequested')
-    async handleUserPasswordReset(event: UserPasswordResetEvent) {
+     handleUserPasswordReset(event: UserPasswordResetEvent) {
         const { user, temporaryToken, expiresAt } = event;
 
         // Send Password Reset Email to the user
@@ -32,7 +32,7 @@ export class UserPasswordResetHandler {
                   year: new Date().getFullYear().toString(),
                 },
               };
-        await this.mailService.sendMail(mail);
+        this.mailService.sendMail(mail);
     }
 
 }

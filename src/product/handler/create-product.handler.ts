@@ -34,6 +34,18 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
         relations: ['user'],
       });
 
+      if (!store) {
+        throw new HttpException({ message: "You are not allowed to add products to this store" }, HttpStatus.FORBIDDEN);
+      }
+
+      if(!store.isVerified) {
+        throw new HttpException({ message: "Store is not verified" }, HttpStatus.FORBIDDEN);
+      }
+
+      if(!store.banned){
+        throw new HttpException({ message: "Store is banned" }, HttpStatus.FORBIDDEN);
+      }
+
       const category = await this.categoryRepo.findOne({
         where: { id: categoryId },
       })
@@ -42,9 +54,7 @@ export class CreateProductHandler implements ICommandHandler<CreateProductComman
         throw new HttpException({ message: "Category not found" }, HttpStatus.NOT_FOUND);
       }
 
-      if (!store) {
-        throw new HttpException({ message: "You are not allowed to add products to this store" }, HttpStatus.FORBIDDEN);
-      }
+
 
       const product = this.productRepo.create({
         name,
