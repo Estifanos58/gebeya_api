@@ -32,6 +32,9 @@ export class Store {
     @Column({name: "is_verified", type: "boolean" ,default: false})
     isVerified: boolean;
 
+    @Column({name: "banned", type: "boolean", default: false})
+    banned: boolean;
+
     @OneToMany(()=> Payment, payment => payment.store, { nullable: true })
     payments: Payment[];
 

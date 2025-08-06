@@ -414,3 +414,229 @@ export const ORDER_PLACED_TEMPLATE =
 </html>
 
 `
+
+export const STORE_DISAPPROVED_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Store Disapproval Notification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #dc3545;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #0d6efd;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Store Application Disapproved</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+
+        <p>We’ve reviewed your store application for <strong>{storeName}</strong> and unfortunately, it has been disapproved at this time.</p>
+
+        <p><strong>Reason:</strong> {reason}</p>
+
+        <p>If you believe this decision was made in error or you would like to submit additional information, feel free to contact our support team.</p>
+
+        <a href="{supportLink}" class="button">Contact Support</a>
+
+        <p>Thank you for your interest and understanding.</p>
+
+        <p>Best regards,<br />The Store Review Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
+
+`
+
+export const STORE_APPROVED_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Store Approval</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #198754;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #198754;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Your Store Has Been Approved!</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+        <p>Congratulations! Your store <strong>{storeName}</strong> has been successfully approved by our team.</p>
+
+        <p>You can now start adding products, managing orders, and growing your business.</p>
+
+        <a href="{dashboardLink}" class="button">Go to Dashboard</a>
+
+        <p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
+
+        <p>We’re excited to have you on board!<br />The Support Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
+`
+export const STORE_BANNED_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Store Banned</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #dc3545;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #dc3545;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Your Store Has Been Banned</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+        <p>We regret to inform you that your store <strong>{storeName}</strong> has been banned from our platform due to a violation of our policies.</p>
+
+        <p><strong>Reason:</strong> {reason}</p>
+        
+        <p>We take these actions to ensure a safe and fair marketplace for all users.</p>
+
+        <p>Please review our <a href="{policyLink}">terms and conditions</a> to better understand what may have caused this action.</p>
+
+        <p>If you believe this was a mistake or would like to appeal the decision, you can contact our support team by clicking the button below.</p>
+
+        <a href="{supportLink}" class="button">Contact Support</a>
+
+        <p>Thank you for your understanding.<br />The Support Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
+`

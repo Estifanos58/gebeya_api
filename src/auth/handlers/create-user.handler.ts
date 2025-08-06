@@ -89,8 +89,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       this.eventEmitter.emit(
         'user.registered',
         new UserRegisterEvent(
-          user.email,
-          user.firstName,
+          user,
           credentials?.otp.toString(),
           credentials.otpExpires_at.toLocaleString(),
         ),
