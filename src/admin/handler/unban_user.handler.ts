@@ -1,4 +1,4 @@
-import { ICommandHandler } from "@nestjs/cqrs";
+import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "@/entities";
 import { Repository } from "typeorm";
@@ -9,6 +9,7 @@ import { NotFoundException } from "@nestjs/common";
 import { UserUnbanCommand } from "../command/unban_user.command";
 import { UserUnBanEvent } from "../event/user/user_unban_event";
 
+@CommandHandler(UserUnbanCommand)
 export class UserUnbanHandler implements ICommandHandler<UserUnbanCommand>{
 
     constructor(
