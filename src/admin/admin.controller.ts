@@ -11,7 +11,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { ApproveStoreDto } from './dto/approve_store.dto';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApproveStoreCommand } from './command/approve_store.command';
 import { Request, Response } from 'express';
 import { BannedStoreDto } from './dto/banned_store.dto';
@@ -24,7 +24,10 @@ import { GetUsersQuery } from './query/get_users.query';
 @Controller('admin')
 @Roles([UserRole.ADMIN])
 export class AdminController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
 
   @Post('store/:storeId')
   async approveStore(
@@ -70,14 +73,14 @@ export class AdminController {
   async getUsers(
     @Query('search') search: string = '',
     @Query('role') role: UserRole | null = null,
-    @Query('status') status: string | null = null,
+    @Query('status') status: boolean | null = null,
     @Query('order') order: 'asc' | 'desc' = 'desc',
     @Query('banned') banned: boolean | null = null,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Res() res: Response,
   ): Promise<any> {
-    return this.commandBus.execute(
+    return this.queryBus.execute(
       new GetUsersQuery(search, role, status, order, banned, page, limit),
     );
   }
