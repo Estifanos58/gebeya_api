@@ -69,7 +69,7 @@ export const WELCOME_OTP_TEMPLATE = `
     </div>
   </body>
 </html>
-`
+`;
 
 export const PASSWORD_RESET_TEMPLATE = `
 <!DOCTYPE html>
@@ -142,7 +142,7 @@ export const PASSWORD_RESET_TEMPLATE = `
     </div>
   </body>
 </html>
-`
+`;
 
 export const PASSWROD_RESET_SUCCESS_TEMPLATE = `
 <!DOCTYPE html>
@@ -217,10 +217,9 @@ export const PASSWROD_RESET_SUCCESS_TEMPLATE = `
     </div>
   </body>
 </html>
-`
+`;
 
-export const PAYMENT_SUCCESSFUL_TEMPLATE = 
-`
+export const PAYMENT_SUCCESSFUL_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -315,10 +314,9 @@ export const PAYMENT_SUCCESSFUL_TEMPLATE =
     </div>
   </body>
 </html>
-`
+`;
 
-export const ORDER_PLACED_TEMPLATE = 
-`
+export const ORDER_PLACED_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -413,7 +411,7 @@ export const ORDER_PLACED_TEMPLATE =
   </body>
 </html>
 
-`
+`;
 
 export const STORE_DISAPPROVED_TEMPLATE = `
 <!DOCTYPE html>
@@ -490,7 +488,7 @@ export const STORE_DISAPPROVED_TEMPLATE = `
   </body>
 </html>
 
-`
+`;
 
 export const STORE_APPROVED_TEMPLATE = `
 <!DOCTYPE html>
@@ -563,7 +561,7 @@ export const STORE_APPROVED_TEMPLATE = `
     </div>
   </body>
 </html>
-`
+`;
 export const STORE_BANNED_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
@@ -639,10 +637,9 @@ export const STORE_BANNED_TEMPLATE = `
     </div>
   </body>
 </html>
-`
+`;
 
-export const STORE_UNBANNED_TEMPLATE = 
-`
+export const STORE_UNBANNED_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -713,10 +710,9 @@ export const STORE_UNBANNED_TEMPLATE =
     </div>
   </body>
 </html>
-`
+`;
 
-export const USER_BANNED_TEMPLATE = 
-`<!DOCTYPE html>
+export const USER_BANNED_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -741,6 +737,16 @@ export const USER_BANNED_TEMPLATE =
         color: #ffffff;
         padding: 20px;
         text-align: center;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #dc3545;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 20px 0;
       }
       .content {
         padding: 30px;
@@ -778,10 +784,9 @@ export const USER_BANNED_TEMPLATE =
     </div>
   </body>
 </html>
-`
+`;
 
-export const USER_UNBANNED_TEMPLATE =
-`
+export const USER_UNBANNED_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -841,4 +846,4 @@ export const USER_UNBANNED_TEMPLATE =
     </div>
   </body>
 </html>
-`
+`;

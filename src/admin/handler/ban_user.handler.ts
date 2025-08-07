@@ -24,7 +24,6 @@ export class UserBanHandler implements ICommandHandler<UserBanCommand> {
     try {
       const user = await this.userRepository.findOne({
         where: { id: userId },
-        relations: ['user'],
       });
 
       if(!user) {

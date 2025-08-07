@@ -11,6 +11,7 @@ import { StoreEventHandler } from './event/store/store_event_handler';
 import { UnBanStoreHandler } from './handler/unban_store.hanlder';
 import { UserBanHandler } from './handler/ban_user.handler';
 import { UserUnbanHandler } from './handler/unban_user.handler';
+import { GetUsersHandler } from './handler/get_users.handler';
 
 const CommandHandlers = [
   ApproveStoreHandler,
@@ -20,9 +21,11 @@ const CommandHandlers = [
   UserUnbanHandler,
 ];
 
+const QueryHandlers = [GetUsersHandler];
+
 @Module({
   imports: [CqrsModule, EntityModule, ActivityLogModule, MailModule],
   controllers: [AdminController],
-  providers: [StoreEventHandler, ...CommandHandlers, UserEventHandler],
+  providers: [...CommandHandlers,...QueryHandlers, UserEventHandler, StoreEventHandler],
 })
 export class AdminModule {}
