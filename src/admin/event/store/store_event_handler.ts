@@ -7,11 +7,13 @@ import {
   STORE_APPROVED_TEMPLATE,
   STORE_BANNED_TEMPLATE,
   STORE_DISAPPROVED_TEMPLATE,
+  STORE_UNBANNED_TEMPLATE,
 } from '@/utils/templates';
 import { StoreBanEvent } from './store_ban_event';
+import { StoreUnBanEvent } from './store_unban_event';
 
 @Injectable()
-export class StoreApproveEventHandler {
+export class StoreEventHandler {
   constructor(
     private readonly mailService: MailService,
     private readonly activityLogService: ActivityLogService,
@@ -114,8 +116,8 @@ export class StoreApproveEventHandler {
       };
       this.mailService.sendMail(mail).catch((error) => {
         this.activityLogService.error(
-          'Failed to send store Disapproval email',
-          'Admin/StoreApproveEvent',
+          'Failed to send store Ban email',
+          'Admin/StoreBanEvent',
           store.user.email,
           store.user.role,
           { StoreId: store.id, error: error.message },
@@ -133,6 +135,48 @@ export class StoreApproveEventHandler {
           error: error.message,
         },
       );
+    }
+  }
+
+  @OnEvent('store.unbanned')
+  handleStoreUnbannedEvent(payload: StoreUnBanEvent) {
+    const {store}  = payload;
+
+    try {
+      const html = STORE_UNBANNED_TEMPLATE;
+      const mail = {
+        to: store.user.email,
+        subject: 'Store UnBan Notification',
+        html: html,
+        placeholders: {
+          name: store.user.firstName,
+          storeName: store.name,
+          dashboardLink: 'https://yourapp.com/dashboard',
+          year: new Date().getFullYear().toString(),
+        },
+      };
+      this.mailService.sendMail(mail).catch((error) => {
+        this.activityLogService.error(
+          'Failed to send store UnBan email',
+          'Admin/StoreUnbanEvent',
+          store.user.email,
+          store.user.role,
+          { StoreId: store.id, error: error.message },
+        );
+      });
+    } catch (error) {
+      this.activityLogService.error(
+        'Failed to handle store Unban event',
+        'Admin/StoreUnBanEvent',
+        store.user.email,
+        store.user.role,
+        {
+          StoreId: store.id,
+          Owner_Email: store.user.email,
+          error: error.message,
+        },
+      );
+      
     }
   }
 }

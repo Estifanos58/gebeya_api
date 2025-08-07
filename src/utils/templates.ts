@@ -640,3 +640,205 @@ export const STORE_BANNED_TEMPLATE = `
   </body>
 </html>
 `
+
+export const STORE_UNBANNED_TEMPLATE = 
+`
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Store Reinstated</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #198754;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #198754;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Your Store Has Been Reinstated</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+        <p>We’re pleased to inform you that your store <strong>{storeName}</strong> has been reinstated after a thorough review.</p>
+
+        <p>You can now resume managing your products, fulfilling orders, and serving your customers without any restrictions.</p>
+
+        <a href="{dashboardLink}" class="button">Go to Dashboard</a>
+
+        <p>If you have any further questions or concerns, feel free to contact our support team at any time.</p>
+
+        <p>Thank you for your cooperation.<br />The Support Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
+`
+
+export const USER_BANNED_TEMPLATE = 
+`<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Account Ban Notification</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #dc3545;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Account Banned</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+
+        <p>We regret to inform you that your account has been permanently banned from our platform. This means you will no longer be able to browse, purchase, or interact with any stores on our site.</p>
+
+        <p>This decision was made based on violations of our platform rules and community guidelines. We take these actions seriously to protect the experience of our users and sellers.</p>
+
+         <p>If you believe this was a mistake or would like to appeal the decision, you can contact our support team by clicking the button below.</p>
+
+        <a href="{supportLink}" class="button">Contact Support</a>
+
+
+        <p>Thank you for your understanding.<br />The Support Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
+`
+
+export const USER_UNBANNED_TEMPLATE =
+`
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Account Reinstated</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f7;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background-color: #28a745;
+        color: #ffffff;
+        padding: 20px;
+        text-align: center;
+      }
+      .content {
+        padding: 30px;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
+        color: #999999;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h2>Account Reinstated</h2>
+      </div>
+      <div class="content">
+        <p>Hi <strong>{name}</strong>,</p>
+
+        <p>We’re happy to inform you that your account has been reinstated and you now have full access to our platform again.</p>
+
+        <p>You can now browse products, make purchases, and interact with stores just like before.</p>
+
+        <p>We appreciate your patience during the review process.</p>
+
+        <p>Welcome back!<br />The Support Team</p>
+      </div>
+      <div class="footer">
+        © {year} YourCompany. All rights reserved.
+      </div>
+    </div>
+  </body>
+</html>
+`
