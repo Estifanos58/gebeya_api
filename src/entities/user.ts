@@ -51,6 +51,9 @@ export class User {
   @Column({ default: false })
   isEmailVerified: boolean;
 
+  @Column({ name:"banned", default: false })
+  banned: boolean;
+
   @OneToMany(() => Cart, (cart) => cart.user, {cascade: true})
   carts: Cart[];
 
