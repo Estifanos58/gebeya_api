@@ -1,14 +1,14 @@
 import { Roles } from '@/decorator/roles.decorator';
-import { UserRole } from '@/entities';
+import { ActivityLog, UserRole } from '@/entities';
 import {
   Body,
   Controller,
   Get,
   Param,
+  ParseBoolPipe,
   Post,
   Query,
   Req,
-  Res,
 } from '@nestjs/common';
 import { ApproveStoreDto } from './dto/approve_store.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -22,6 +22,7 @@ import { UserUnbanCommand } from './command/unban_user.command';
 import { GetUsersQuery } from './query/get_users.query';
 import { GetStoresQuery, StoreSortQuery } from './query/get_stores.query';
 import { GetActivitiesQuery } from './query/get_activities.query';
+import { GetActivityByIdQuery } from './query/get_activity_byId.query';
 
 @Controller('admin')
 @Roles([UserRole.ADMIN])
@@ -73,14 +74,13 @@ export class AdminController {
 
   @Get('users')
   async getUsers(
-    @Query('search') search: string = '',
-    @Query('role') role: UserRole | null = null,
-    @Query('status') status: boolean | null = null,
+    @Query('search') search?: string,
+    @Query('role') role?: UserRole,
+    @Query('status', ParseBoolPipe) status?: boolean,
     @Query('order') order: 'asc' | 'desc' = 'desc',
-    @Query('banned') banned: boolean | null = null,
+    @Query('banned', ParseBoolPipe) banned?: boolean,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-    @Res() res: Response,
   ): Promise<any> {
     return this.queryBus.execute(
       new GetUsersQuery(search, role, status, order, banned, page, limit),
@@ -89,13 +89,13 @@ export class AdminController {
 
   @Get('store')
   async getStores(
-    @Query('search') search: string,
-    @Query('verified') verified: boolean,
-    @Query('sortBy') sortBy: StoreSortQuery,
+    @Query('search') search: string = '',
+    @Query('verified', ParseBoolPipe) verified?: boolean,
+    @Query('banned', ParseBoolPipe) banned?: boolean,
+    @Query('sortBy') sortBy: StoreSortQuery = StoreSortQuery.STORE_CREATED_AT,
     @Query('order') order: 'asc' | 'desc' = 'desc',
-    @Query('banned') banned: boolean,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.queryBus.execute(
       new GetStoresQuery(search, verified, sortBy, order, banned, page, limit),
@@ -104,14 +104,19 @@ export class AdminController {
 
   @Get('activity')
   async getActivity(
-    @Query('error') error: boolean,
-    @Query('info') info: boolean,
-    @Query('warning') warning: boolean,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('error', ParseBoolPipe) error?: boolean,
+    @Query('info', ParseBoolPipe) info?: boolean,
+    @Query('warning', ParseBoolPipe) warning?: boolean,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.queryBus.execute(
       new GetActivitiesQuery(error, info, warning, page, limit),
     );
+  }
+
+  @Get('activity/:id')
+  async getActivityById(@Param('id') id: ActivityLog['id']) {
+    return this.queryBus.execute(new GetActivityByIdQuery(id));
   }
 }
