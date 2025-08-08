@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 import { ActivityLogService } from '@/log/activityLog.service';
 import { GetStoresQuery, StoreSortQuery } from '../query/get_stores.query';
+import { BadRequestException } from '@nestjs/common';
 
 @QueryHandler(GetStoresQuery)
 export class GetStoresHandler implements IQueryHandler<GetStoresQuery> {
@@ -21,6 +22,8 @@ async execute(query: GetStoresQuery): Promise<any> {
     const pageNumber = page && page > 0 ? page : 1;
     const pageSize = limit && limit > 0 ? limit : 10;
     const skip = (pageNumber - 1) * pageSize;
+    if (!Object.values(StoreSortQuery).includes(sortBy as StoreSortQuery))
+        throw new BadRequestException('Invalid sortBy value');
 
     const queryBuilder = this.storeRepository
       .createQueryBuilder('store')
@@ -58,6 +61,7 @@ async execute(query: GetStoresQuery): Promise<any> {
       queryBuilder.orderBy(`store.${sortBy}`, order.toUpperCase() as 'ASC' | 'DESC');
     }
 
+    const total = await queryBuilder.getCount();
     queryBuilder.skip(skip).take(pageSize);
 
     const { entities, raw } = await queryBuilder.getRawAndEntities();
@@ -69,8 +73,6 @@ async execute(query: GetStoresQuery): Promise<any> {
         orderCount: Number(rawRow.orderCount) || 0,
       };
     });
-
-    const total = await queryBuilder.getCount(); // Total after filters (but before pagination)
 
     return {
       message: 'Stores retrieved successfully',
