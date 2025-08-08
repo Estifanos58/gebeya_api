@@ -21,6 +21,7 @@ import { UserBanCommand } from './command/ban_user.command';
 import { UserUnbanCommand } from './command/unban_user.command';
 import { GetUsersQuery } from './query/get_users.query';
 import { GetStoresQuery, StoreSortQuery } from './query/get_stores.query';
+import { GetActivitiesQuery } from './query/get_activities.query';
 
 @Controller('admin')
 @Roles([UserRole.ADMIN])
@@ -86,27 +87,31 @@ export class AdminController {
     );
   }
 
-
   @Get('store')
   async getStores(
-    @Query('search') search: string = '',
-    @Query('verified') verified: boolean | null = null,
-    @Query('sortBy') sortBy: StoreSortQuery = StoreSortQuery.STORE_CREATED_AT,
+    @Query('search') search: string,
+    @Query('verified') verified: boolean,
+    @Query('sortBy') sortBy: StoreSortQuery,
     @Query('order') order: 'asc' | 'desc' = 'desc',
-    @Query('banned') banned: boolean | null = null,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('banned') banned: boolean,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
   ): Promise<any> {
     return this.queryBus.execute(
-      new GetStoresQuery(
-        search,
-        verified,
-        sortBy,
-        order,
-        banned,
-        page,
-        limit,
-      ),
-    )
+      new GetStoresQuery(search, verified, sortBy, order, banned, page, limit),
+    );
+  }
+
+  @Get('activity')
+  async getActivity(
+    @Query('error') error: boolean,
+    @Query('info') info: boolean,
+    @Query('warning') warning: boolean,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<any> {
+    return this.queryBus.execute(
+      new GetActivitiesQuery(error, info, warning, page, limit),
+    );
   }
 }
