@@ -13,6 +13,7 @@ import { UserBanHandler } from './handler/ban_user.handler';
 import { UserUnbanHandler } from './handler/unban_user.handler';
 import { GetUsersHandler } from './handler/get_users.handler';
 import { GetStoresHandler } from './handler/get_stores.handler';
+import { GetActivitiesHandler } from './handler/get_activities.handler';
 
 const CommandHandlers = [
   ApproveStoreHandler,
@@ -22,11 +23,16 @@ const CommandHandlers = [
   UserUnbanHandler,
 ];
 
-const QueryHandlers = [GetUsersHandler,GetStoresHandler];
+const QueryHandlers = [GetUsersHandler, GetStoresHandler, GetActivitiesHandler];
 
 @Module({
   imports: [CqrsModule, EntityModule, ActivityLogModule, MailModule],
   controllers: [AdminController],
-  providers: [...CommandHandlers,...QueryHandlers, UserEventHandler, StoreEventHandler],
+  providers: [
+    ...CommandHandlers,
+    ...QueryHandlers,
+    UserEventHandler,
+    StoreEventHandler,
+  ],
 })
 export class AdminModule {}
