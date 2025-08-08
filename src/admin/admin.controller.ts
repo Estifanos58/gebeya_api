@@ -20,6 +20,7 @@ import { UnBanStoreCommand } from './command/upban_store.command';
 import { UserBanCommand } from './command/ban_user.command';
 import { UserUnbanCommand } from './command/unban_user.command';
 import { GetUsersQuery } from './query/get_users.query';
+import { GetStoresQuery, StoreSortQuery } from './query/get_stores.query';
 
 @Controller('admin')
 @Roles([UserRole.ADMIN])
@@ -83,5 +84,29 @@ export class AdminController {
     return this.queryBus.execute(
       new GetUsersQuery(search, role, status, order, banned, page, limit),
     );
+  }
+
+
+  @Get('store')
+  async getStores(
+    @Query('search') search: string = '',
+    @Query('verified') verified: boolean | null = null,
+    @Query('sortBy') sortBy: StoreSortQuery = StoreSortQuery.STORE_CREATED_AT,
+    @Query('order') order: 'asc' | 'desc' = 'desc',
+    @Query('banned') banned: boolean | null = null,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    return this.queryBus.execute(
+      new GetStoresQuery(
+        search,
+        verified,
+        sortBy,
+        order,
+        banned,
+        page,
+        limit,
+      ),
+    )
   }
 }

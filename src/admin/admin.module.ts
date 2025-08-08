@@ -12,6 +12,7 @@ import { UnBanStoreHandler } from './handler/unban_store.hanlder';
 import { UserBanHandler } from './handler/ban_user.handler';
 import { UserUnbanHandler } from './handler/unban_user.handler';
 import { GetUsersHandler } from './handler/get_users.handler';
+import { GetStoresHandler } from './handler/get_stores.handler';
 
 const CommandHandlers = [
   ApproveStoreHandler,
@@ -21,7 +22,7 @@ const CommandHandlers = [
   UserUnbanHandler,
 ];
 
-const QueryHandlers = [GetUsersHandler];
+const QueryHandlers = [GetUsersHandler,GetStoresHandler];
 
 @Module({
   imports: [CqrsModule, EntityModule, ActivityLogModule, MailModule],
