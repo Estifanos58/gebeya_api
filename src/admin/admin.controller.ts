@@ -76,9 +76,9 @@ export class AdminController {
   async getUsers(
     @Query('search') search?: string,
     @Query('role') role?: UserRole,
-    @Query('status') status?: boolean,
+    @Query('status', ParseBoolPipe) status?: boolean,
     @Query('order') order: 'asc' | 'desc' = 'desc',
-    @Query('banned') banned?: boolean,
+    @Query('banned', ParseBoolPipe) banned?: boolean,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<any> {
@@ -104,9 +104,9 @@ export class AdminController {
 
   @Get('activity')
   async getActivity(
-    @Query('error') error: boolean | null = null,
-    @Query('info') info: boolean | null = null,
-    @Query('warning') warning: boolean | null = null,
+    @Query('error', ParseBoolPipe) error?: boolean,
+    @Query('info', ParseBoolPipe) info?: boolean,
+    @Query('warning', ParseBoolPipe) warning?: boolean,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ): Promise<any> {
