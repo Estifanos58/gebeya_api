@@ -6,12 +6,9 @@ import {
   Get,
   Param,
   ParseBoolPipe,
-  ParseEnumPipe,
-  ParseIntPipe,
   Post,
   Query,
   Req,
-  Res,
 } from '@nestjs/common';
 import { ApproveStoreDto } from './dto/approve_store.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -75,31 +72,30 @@ export class AdminController {
     return this.commandBus.execute(new UserUnbanCommand(userId));
   }
 
-@Get('users')
-async getUsers(
-  @Query('search') search?: string,
-  @Query('role') role?: UserRole,
-  @Query('status') status?: boolean,
-  @Query('order') order: 'asc' | 'desc' = 'desc',
-  @Query('banned') banned?: boolean,
-  @Query('page') page: number = 1,
-  @Query('limit') limit: number = 10,
-): Promise<any> {
-  return this.queryBus.execute(
-    new GetUsersQuery(search, role, status, order, banned, page, limit),
-  );
-}
-
+  @Get('users')
+  async getUsers(
+    @Query('search') search?: string,
+    @Query('role') role?: UserRole,
+    @Query('status') status?: boolean,
+    @Query('order') order: 'asc' | 'desc' = 'desc',
+    @Query('banned') banned?: boolean,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ): Promise<any> {
+    return this.queryBus.execute(
+      new GetUsersQuery(search, role, status, order, banned, page, limit),
+    );
+  }
 
   @Get('store')
   async getStores(
     @Query('search') search: string = '',
-    @Query('verified', ParseBoolPipe) verified: boolean | null = null,
+    @Query('verified', ParseBoolPipe) verified?: boolean,
+    @Query('banned', ParseBoolPipe) banned?: boolean,
     @Query('sortBy') sortBy: StoreSortQuery = StoreSortQuery.STORE_CREATED_AT,
     @Query('order') order: 'asc' | 'desc' = 'desc',
-    @Query('banned', ParseBoolPipe) banned: boolean | null = null,
-    @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.queryBus.execute(
       new GetStoresQuery(search, verified, sortBy, order, banned, page, limit),
@@ -108,11 +104,11 @@ async getUsers(
 
   @Get('activity')
   async getActivity(
-    @Query('error', ParseBoolPipe) error: boolean | null = null,
-    @Query('info', ParseBoolPipe) info: boolean | null = null,
-    @Query('warning', ParseBoolPipe) warning: boolean | null = null,
-    @Query('page', ParseIntPipe) page: number = 1,
-    @Query('limit', ParseIntPipe) limit: number = 10,
+    @Query('error') error: boolean | null = null,
+    @Query('info') info: boolean | null = null,
+    @Query('warning') warning: boolean | null = null,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
   ): Promise<any> {
     return this.queryBus.execute(
       new GetActivitiesQuery(error, info, warning, page, limit),
@@ -120,9 +116,7 @@ async getUsers(
   }
 
   @Get('activity/:id')
-  async getActivityById(
-    @Param('id') id: ActivityLog['id']
-  ){
-      return this.queryBus.execute(new GetActivityByIdQuery(id))
+  async getActivityById(@Param('id') id: ActivityLog['id']) {
+    return this.queryBus.execute(new GetActivityByIdQuery(id));
   }
 }
