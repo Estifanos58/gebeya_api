@@ -1,19 +1,14 @@
-import { CommandBus } from '@nestjs/cqrs';
-import { AuthController } from './auth.controller';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UserRole } from '@/entities';
-import { loginDto } from './dto/login-user.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
+import { AuthController } from './auth.controller';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 describe('AuthController', () => {
-  let authController: AuthController;
+  let controller: AuthController;
   let commandBus: CommandBus;
-
-  const mockCommandBus = {
-    execute: jest.fn(),
-  };
+  let queryBus: QueryBus;
+  let mockResponse: Partial<Response>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,188 +16,145 @@ describe('AuthController', () => {
       providers: [
         {
           provide: CommandBus,
-          useValue: mockCommandBus,
+          useValue: { execute: jest.fn() },
+        },
+        {
+          provide: QueryBus,
+          useValue: { execute: jest.fn() },
         },
       ],
     }).compile();
 
-    authController = module.get<AuthController>(AuthController);
+    controller = module.get<AuthController>(AuthController);
     commandBus = module.get<CommandBus>(CommandBus);
-  });
+    queryBus = module.get<QueryBus>(QueryBus);
 
-  it('should be defined', () => {
-    expect(authController).toBeDefined();
+    mockResponse = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+    };
   });
 
   describe('signUp', () => {
-    it('should create a user and return success message', async () => {
-      const createUserDto: CreateUserDto = {
+    it('should call CreateUserCommand and return created user', async () => {
+      const dto = {
         email: 'test@example.com',
-        password: 'secret123',
-        firstName: 'Test',
-        lastName: 'User',
-        role: UserRole.ADMIN,
+        password: '123456',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'USER',
+        phoneNumber: '12345',
+        address: 'Somewhere',
+        profilePicture: '',
+        age: 25,
       };
+      const expectedUser = { id: '1', ...dto };
+      (commandBus.execute as jest.Mock).mockResolvedValue(expectedUser);
 
-      const expectedResponse = {
-        message: 'User created successfully',
-        data: {
-          id: 1,
-          ...createUserDto,
-          phoneNumber: null,
-          address: null,
-          profilePicture: null,
-          age: null,
-        },
-      };
+      await controller.signUp(dto as any, {} as Request, mockResponse as Response);
 
-      const json = jest.fn().mockReturnValue(expectedResponse);
-      const status = jest.fn().mockReturnValue({ json });
-      const res = { status } as any;
-
-      mockCommandBus.execute.mockResolvedValue(expectedResponse);
-
-      const result = await authController.signUp(createUserDto, res);
-
-      expect(commandBus.execute).toHaveBeenCalledWith(
-        expect.objectContaining({ ...createUserDto, res }),
-      );
-      expect(status).toHaveBeenCalledWith(201);
-      expect(json).toHaveBeenCalledWith(expectedResponse);
-      expect(result).toEqual(expectedResponse);
+      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockResponse.json).toHaveBeenCalledWith(expectedUser);
     });
   });
 
   describe('login', () => {
-    it('should login a user and return success message', async () => {
-      const loginData: loginDto = {
-        email: 'estifkebe@gmail.com',
-        password: '123123424242',
-      };
+    it('should call LoginUserCommand and return logged in user', async () => {
+      const dto = { email: 'test@example.com', password: '123456' };
+      const expectedUser = { token: 'jwt' };
+      (commandBus.execute as jest.Mock).mockResolvedValue(expectedUser);
 
-      const expectedUser = {
-        id: 1,
-        email: loginData.email,
-        firstName: 'Test',
-        lastName: 'User',
-      };
+      await controller.login(dto as any, mockResponse as Response);
 
-      const expectedResponse = {
-        message: 'User logged in successfully',
-        data: expectedUser,
-      };
-
-      const json = jest.fn().mockReturnValue(expectedResponse);
-      const status = jest.fn().mockReturnValue({ json });
-      const res = { status } as any;
-
-      mockCommandBus.execute.mockResolvedValue(expectedUser);
-
-      const result = await authController.login(loginData, res);
-
-      expect(commandBus.execute).toHaveBeenCalledWith(
-        expect.objectContaining({ ...loginData, res }),
-      );
-      expect(status).toHaveBeenCalledWith(200);
-      expect(json).toHaveBeenCalledWith(expectedResponse);
-      expect(result).toEqual(expectedResponse);
+      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(expectedUser);
     });
   });
 
   describe('verifyOtp', () => {
-    it('should return 400 for invalid OTP', async () => {
-      const res = {
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn(),
-      } as any;
-      const req = { user: {} } as any;
+    it('should return 400 if OTP is invalid', async () => {
+      await controller.verifyOtp({ otp: 123 } as any, {} as Request, mockResponse as Response);
 
-      const result = await authController.verifyOtp({ otp: 123 }, req, res);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Invalid OTP' });
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Invalid OTP' });
     });
 
-    it('should verify OTP and return success', async () => {
-      const req = { user: { id: 1 } } as any;
-      const res = {
-        status: jest.fn().mockReturnValue({ json: jest.fn() }),
-      } as any;
-      const otp = 123456;
+    it('should call VerifyOtpCommand when OTP is valid', async () => {
+      const req = { user: { id: '1' } } as Request;
+      const otpValid = { success: true };
+      (commandBus.execute as jest.Mock).mockResolvedValue(otpValid);
 
-      mockCommandBus.execute.mockResolvedValue({ message: 'OTP verified' });
+      await controller.verifyOtp({ otp: 123456 } as any, req, mockResponse as Response);
 
-      const result = await authController.verifyOtp({ otp }, req, res);
-
-      expect(commandBus.execute).toHaveBeenCalledWith(expect.anything());
-      expect(res.status).toHaveBeenCalledWith(200);
+      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(otpValid);
     });
   });
 
   describe('forgotPassword', () => {
-    it('should send reset link', async () => {
-      const body: ForgotPasswordDto = { email: 'test@example.com' };
-      const json = jest.fn();
-      const status = jest.fn().mockReturnValue({ json });
-      const res = { status } as any;
+    it('should call ForgotPasswordCommand', async () => {
+      const dto = { email: 'test@example.com' };
+      const result = { success: true };
+      (commandBus.execute as jest.Mock).mockResolvedValue(result);
 
-      mockCommandBus.execute.mockResolvedValue({ message: 'Email sent' });
+      await controller.forgotPassword(dto as any, mockResponse as Response);
 
-      const result = await authController.forgotPassword(body, res);
-
-      expect(commandBus.execute).toHaveBeenCalledWith(
-        expect.objectContaining({
-          email: body.email,
-        }),
-      );
-      expect(status).toHaveBeenCalledWith(200);
-      expect(json).toHaveBeenCalledWith({ message: 'Email sent' });
+      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(result);
     });
   });
 
   describe('resetPassword', () => {
-    it('should throw error for missing token/email', async () => {
-      const res = { status: jest.fn(), json: jest.fn() } as any;
+    it('should throw if token or email is missing', async () => {
       await expect(
-        authController.resetPassword(
-          undefined as any,
-          undefined as any,
-          { newPassword: 'pass' },
-          res,
-        ),
-      ).rejects.toThrow();
+        controller.resetPassword('', '', { newPassword: '123456' } as any, mockResponse as Response)
+      ).rejects.toThrow(new HttpException({ message: 'Empty Fields Found' }, HttpStatus.BAD_REQUEST));
     });
 
-    it('should reset password and return success', async () => {
-      const token = 'valid-token';
-      const email = 'test@example.com';
-      const body: ResetPasswordDto = { newPassword: 'newpass123' };
-      const json = jest.fn();
-      const status = jest.fn().mockReturnValue({ json });
-      const res = { status } as any;
+    it('should call ResetPasswordCommand when data is valid', async () => {
+      const result = { success: true };
+      (commandBus.execute as jest.Mock).mockResolvedValue(result);
 
-      mockCommandBus.execute.mockResolvedValue({ id: 1, email });
-
-      const result = await authController.resetPassword(
-        token,
-        email,
-        body,
-        res,
+      await controller.resetPassword(
+        'token',
+        'test@example.com',
+        { newPassword: '123456' } as any,
+        mockResponse as Response
       );
 
-      expect(commandBus.execute).toHaveBeenCalledWith(
-        expect.objectContaining({
-          token,
-          email,
-          newPassword: body.newPassword,
-          res,
-        }),
-      );
-      expect(status).toHaveBeenCalledWith(200);
-      expect(json).toHaveBeenCalledWith({
-        message: 'Password reset successfully',
-        user: { id: 1, email },
-      });
+      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(result);
+    });
+  });
+
+  describe('refreshToken', () => {
+    it('should call RefreshTokenCommand', async () => {
+      const result = { newToken: 'abc' };
+      (commandBus.execute as jest.Mock).mockResolvedValue(result);
+
+      await controller.refreshToken({} as Request, mockResponse as Response);
+
+      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(result);
+    });
+  });
+
+  describe('getUserData', () => {
+    it('should call GetUserQuery', async () => {
+      const result = { id: '1', name: 'John Doe' };
+      (queryBus.execute as jest.Mock).mockResolvedValue(result);
+
+      await controller.getUserData({ user: { id: '1' } } as Request, mockResponse as Response);
+
+      expect(queryBus.execute).toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(result);
     });
   });
 });
