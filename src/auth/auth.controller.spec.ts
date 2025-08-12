@@ -8,20 +8,14 @@ describe('AuthController', () => {
   let controller: AuthController;
   let commandBus: CommandBus;
   let queryBus: QueryBus;
-  let mockResponse: Partial<Response>;
+  let mockResponse: Response;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
-        {
-          provide: CommandBus,
-          useValue: { execute: jest.fn() },
-        },
-        {
-          provide: QueryBus,
-          useValue: { execute: jest.fn() },
-        },
+        { provide: CommandBus, useValue: { execute: jest.fn() } },
+        { provide: QueryBus, useValue: { execute: jest.fn() } },
       ],
     }).compile();
 
@@ -32,7 +26,7 @@ describe('AuthController', () => {
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn().mockReturnThis(),
-    };
+    } as any as Response;
   });
 
   describe('signUp', () => {
@@ -51,11 +45,21 @@ describe('AuthController', () => {
       const expectedUser = { id: '1', ...dto };
       (commandBus.execute as jest.Mock).mockResolvedValue(expectedUser);
 
-      await controller.signUp(dto as any, {} as Request, mockResponse as Response);
+      await controller.signUp(dto as any, {} as Request, mockResponse);
 
       expect(commandBus.execute).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith(expectedUser);
+    });
+
+    it('should handle errors from CommandBus', async () => {
+      (commandBus.execute as jest.Mock).mockRejectedValue(
+        new Error('DB error'),
+      );
+
+      await expect(
+        controller.signUp({} as any, {} as Request, mockResponse),
+      ).rejects.toThrow('DB error');
     });
   });
 
@@ -65,7 +69,7 @@ describe('AuthController', () => {
       const expectedUser = { token: 'jwt' };
       (commandBus.execute as jest.Mock).mockResolvedValue(expectedUser);
 
-      await controller.login(dto as any, mockResponse as Response);
+      await controller.login(dto as any, mockResponse);
 
       expect(commandBus.execute).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(200);
@@ -75,22 +79,39 @@ describe('AuthController', () => {
 
   describe('verifyOtp', () => {
     it('should return 400 if OTP is invalid', async () => {
-      await controller.verifyOtp({ otp: 123 } as any, {} as Request, mockResponse as Response);
+      await controller.verifyOtp(
+        { otp: 123 } as any,
+        {} as Request,
+        mockResponse,
+      );
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith({ message: 'Invalid OTP' });
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Invalid OTP',
+      });
     });
 
     it('should call VerifyOtpCommand when OTP is valid', async () => {
-      const req = { user: { id: '1' } } as Request;
+      const req = { user: { id: '1' } } as unknown as Request;
       const otpValid = { success: true };
       (commandBus.execute as jest.Mock).mockResolvedValue(otpValid);
 
-      await controller.verifyOtp({ otp: 123456 } as any, req, mockResponse as Response);
+      await controller.verifyOtp({ otp: 123456 } as any, req, mockResponse);
 
       expect(commandBus.execute).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(otpValid);
+    });
+
+    it('should handle errors when CommandBus fails', async () => {
+      const req = { user: { id: '1' } } as unknown as Request;
+      (commandBus.execute as jest.Mock).mockRejectedValue(
+        new Error('OTP service down'),
+      );
+
+      await expect(
+        controller.verifyOtp({ otp: 123456 } as any, req, mockResponse),
+      ).rejects.toThrow('OTP service down');
     });
   });
 
@@ -100,19 +121,37 @@ describe('AuthController', () => {
       const result = { success: true };
       (commandBus.execute as jest.Mock).mockResolvedValue(result);
 
-      await controller.forgotPassword(dto as any, mockResponse as Response);
+      await controller.forgotPassword(dto as any, mockResponse);
 
       expect(commandBus.execute).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(result);
+    });
+
+    it('should return 404 if email is not found', async () => {
+      (commandBus.execute as jest.Mock).mockRejectedValue(
+        new HttpException({ message: 'User not Found' }, HttpStatus.NOT_FOUND),
+      );
+
+      await expect(
+        controller.forgotPassword(
+          { email: 'no@user.com' } as any,
+          mockResponse,
+        ),
+      ).rejects.toThrow('User not Found');
     });
   });
 
   describe('resetPassword', () => {
     it('should throw if token or email is missing', async () => {
       await expect(
-        controller.resetPassword('', '', { newPassword: '123456' } as any, mockResponse as Response)
-      ).rejects.toThrow(new HttpException({ message: 'Empty Fields Found' }, HttpStatus.BAD_REQUEST));
+        controller.resetPassword(
+          '',
+          '',
+          { newPassword: '123456' } as any,
+          mockResponse,
+        ),
+      ).rejects.toThrow('Empty Fields Found');
     });
 
     it('should call ResetPasswordCommand when data is valid', async () => {
@@ -123,7 +162,7 @@ describe('AuthController', () => {
         'token',
         'test@example.com',
         { newPassword: '123456' } as any,
-        mockResponse as Response
+        mockResponse,
       );
 
       expect(commandBus.execute).toHaveBeenCalled();
@@ -137,11 +176,29 @@ describe('AuthController', () => {
       const result = { newToken: 'abc' };
       (commandBus.execute as jest.Mock).mockResolvedValue(result);
 
-      await controller.refreshToken({} as Request, mockResponse as Response);
+      await controller.refreshToken({} as Request, mockResponse);
 
       expect(commandBus.execute).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(result);
+    });
+
+    it('should return 401 if token is invalid', async () => {
+      (commandBus.execute as jest.Mock).mockRejectedValue(
+        new HttpException(
+          { message: 'refresh_token Not Found' },
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
+
+      await expect(
+        controller.refreshToken({} as Request, mockResponse),
+      ).rejects.toThrow(
+        new HttpException(
+          { message: 'refresh_token Not Found' },
+          HttpStatus.BAD_REQUEST,
+        ),
+      );
     });
   });
 
@@ -150,11 +207,29 @@ describe('AuthController', () => {
       const result = { id: '1', name: 'John Doe' };
       (queryBus.execute as jest.Mock).mockResolvedValue(result);
 
-      await controller.getUserData({ user: { id: '1' } } as Request, mockResponse as Response);
+      await controller.getUserData(
+        { user: { id: '1' } } as unknown as Request,
+        mockResponse,
+      );
 
       expect(queryBus.execute).toHaveBeenCalled();
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(result);
+    });
+
+    it('should return 404 if user not found', async () => {
+      (queryBus.execute as jest.Mock).mockRejectedValue(
+        new HttpException({ message: 'User Not Found' }, HttpStatus.NOT_FOUND),
+      );
+
+      await expect(
+        controller.getUserData(
+          { user: { id: '999' } } as unknown as Request,
+          mockResponse,
+        ),
+      ).rejects.toThrow(
+        new HttpException({ message: 'User Not Found' }, HttpStatus.NOT_FOUND),
+      );
     });
   });
 });
