@@ -33,7 +33,7 @@ export class RefreshTokenHandler
       if (!refresh_token) {
         throw new HttpException(
           { message: 'refresh_token Not Found' },
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.UNAUTHORIZED,
         );
       }
 
