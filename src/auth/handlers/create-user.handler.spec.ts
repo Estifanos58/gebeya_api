@@ -9,6 +9,11 @@ import { ActivityLogService } from '@/log/activityLog.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
+// Here the main goal is to test the handler which have the most logics part of the whole app
+// the the testing is different from the controller
+// In the controller we first will initialize the veriables (cotroller, commandBus, and queryBus) to undefiend then we will create a test module and intialize them with the modck test module value
+// the we will mock dto(to depict the user sent data) and the respose is mocked. and we infer that the commandBus.excute method will return the response and hope tests whether the method of the controller we are testing really sends the what the execute method returned
+
 // Mock utils
 jest.mock('src/utils/hashedPassword', () => ({
   hashedPassword: jest.fn().mockResolvedValue('hashed_pw'),
@@ -25,6 +30,8 @@ jest.mock('@/utils/InternalServerError', () => ({
 }));
 
 describe('CreateUserHandler', () => {
+  // First we imported the Handler to be tested
+  // then we will mock the dependece
   let handler: CreateUserHandler;
   let userRepo: jest.Mocked<Repository<User>>;
   let credentialRepo: jest.Mocked<Repository<Credentials>>;
@@ -83,7 +90,7 @@ describe('CreateUserHandler', () => {
       'Doe',
       UserRole.CUSTOMER,
       {} as any, // req
-      mockRes
+      mockRes,
     );
 
     const result = await handler.execute(command);
@@ -110,6 +117,29 @@ describe('CreateUserHandler', () => {
     });
   });
 
+  it('should handle user already exists', async () => {
+    userRepo.findOne.mockResolvedValue({ id: '1', firstName: 'estif' } as User);
+
+    const command = new CreateUserCommand(
+      'test@example.com',
+      'password123',
+      'John',
+      'Doe',
+      UserRole.CUSTOMER,
+      {} as any,
+      {} as any,
+    );
+
+    await handler.execute(command);
+
+    expect(logAndThrowInternalServerError).toHaveBeenCalledWith(
+      expect.any(HttpException),
+      'CreateUserHandler',
+      'User/Registration',
+      activityLogService,
+      expect.any(Object),
+    );
+  });
 
   it('should handle unexpected errors with logAndThrowInternalServerError', async () => {
     userRepo.findOne.mockRejectedValue(new Error('DB connection failed'));
@@ -121,7 +151,7 @@ describe('CreateUserHandler', () => {
       'Doe',
       UserRole.CUSTOMER,
       { ip: '127.0.0.1' } as any,
-      {} as any
+      {} as any,
     );
 
     await handler.execute(command);
