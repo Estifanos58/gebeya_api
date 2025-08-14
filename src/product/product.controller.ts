@@ -28,7 +28,7 @@ import { ApiResponse } from '@nestjs/swagger';
 export class ProductController {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get()
@@ -37,8 +37,8 @@ export class ProductController {
     description: 'Retrieve a list of products',
     type: [CreateProductDto], // Adjust the type as necessary
   })
-  async findAll(@Query() query: QueryProductsDto, @Req() req: Request, @Res() res: Response) {
-    const products = await this.queryBus.execute(
+  async findAll(@Query() query: QueryProductsDto) {
+    return await this.queryBus.execute(
       new GetProductsQuery(
         query.storeId,
         query.categoryId,
@@ -48,11 +48,9 @@ export class ProductController {
         query.limit,
         query.name,
         query.minRange,
-        query.maxRange
-      )
+        query.maxRange,
+      ),
     );
-    return res.status(200).json(products);
-
   }
 
   @Roles([UserRole.MERCHANT]) // Example roles, adjust as necessary
@@ -65,9 +63,8 @@ export class ProductController {
   async create(
     @Body() createProductDto: CreateProductDto,
     @Req() req: Request,
-    @Res() res: Response,
   ) {
-    const product = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new CreateProductCommand(
         createProductDto.name,
         createProductDto.description,
@@ -78,7 +75,6 @@ export class ProductController {
         createProductDto.skus,
       ),
     );
-    return res.status(201).json(product);
   }
 
   @Patch(':id')
@@ -87,19 +83,22 @@ export class ProductController {
     description: 'Product updated successfully',
     type: UpdateProductDto, // Adjust the type as necessary
   })
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto, @Req() req: Request, @Res() res: Response) {
-    const updatedProduct = await this.commandBus.execute(
+  async update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @Req() req: Request,
+  ) {
+    return await this.commandBus.execute(
       new UpdateProductCommand(
         id,
         updateProductDto.name!,
         updateProductDto.description!,
         updateProductDto.cover!,
-        req.userId!, // Assuming userId is part of the DTO
-        updateProductDto.categoryId!, // Assuming categoryId is part of the DTO
-        updateProductDto.skus!, // Assuming skus is part of the DTO
+        req.userId!,
+        updateProductDto.categoryId!, 
+        updateProductDto.skus!, 
       ),
     );
-    return res.status(200).json({...updatedProduct});
   }
 
   @Get(':id')
@@ -108,9 +107,10 @@ export class ProductController {
     description: 'Retrieve a product by ID',
     type: CreateProductDto, // Adjust the type as necessary
   })
-  async findOne(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
-    const product = await this.queryBus.execute(new FindProductQuery(id));
-    return res.status(200).json(product);
+  async findOne(
+    @Param('id') id: string
+  ) { 
+    return await this.queryBus.execute(new FindProductQuery(id));
   }
 
   @Delete(':id')
@@ -118,8 +118,12 @@ export class ProductController {
     status: 200,
     description: 'Product deleted successfully', // Adjust the type as necessary
   })
-  async remove(@Param('id') id: string, @Req() req: Request, @Res() res: Response) {
-    const product = await this.commandBus.execute(new DeleteProductCommand(req.userId!, id));
-    return res.status(200).json({...product});
+  async remove(
+    @Param('id') id: string,
+    @Req() req: Request,
+  ) {
+    return await this.commandBus.execute(
+      new DeleteProductCommand(req.userId!, id),
+    );
   }
 }
