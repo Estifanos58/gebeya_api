@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ForgotPasswordCommand } from '../commands/forgot-password.command';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Credentials, User } from '@/entities';
-import { In, Repository } from 'typeorm';
+import {  Repository } from 'typeorm';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { generateUniqueToken } from 'src/utils/generateOtp';
 import { EventEmitter2 } from '@nestjs/event-emitter';
