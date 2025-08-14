@@ -9,7 +9,7 @@ import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler implements ICommandHandler<CreateProductCommand> {
-
+ 
   constructor(
     @InjectRepository(Store)
     private readonly storeRepo: Repository<Store>,
