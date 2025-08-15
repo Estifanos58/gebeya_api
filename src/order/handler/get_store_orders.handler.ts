@@ -1,6 +1,5 @@
 import { CommandHandler, IQueryHandler } from '@nestjs/cqrs';
 import {
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +11,7 @@ import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 
 @CommandHandler(GetStoreOrdersQuery)
-export class GetOrdersHandler implements IQueryHandler<GetStoreOrdersQuery> {
+export class GetStoreOrdersHandler implements IQueryHandler<GetStoreOrdersQuery> {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
@@ -27,7 +26,7 @@ export class GetOrdersHandler implements IQueryHandler<GetStoreOrdersQuery> {
 
       const orders = await this.orderRepo.find({
         where: whereOptions,
-        relations: ['items', 'items.productSkus', 'store', 'store.user'],
+        relations: ['items', 'items.productSkus', 'store', 'store.user']
       });
 
       if (!orders || orders.length === 0) {

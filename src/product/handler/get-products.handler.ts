@@ -7,7 +7,6 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 import { ActivityLogService } from '@/log/activityLog.service';
 import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
-
 @QueryHandler(GetProductsQuery)
 export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
   constructor(
@@ -124,7 +123,7 @@ export class GetProductsHandler implements IQueryHandler<GetProductsQuery> {
         {
           storeId,
         },
-      )
+      );
     }
   }
 }
