@@ -21,10 +21,10 @@ export class FindProductHandler implements IQueryHandler<FindProductQuery> {
     try {
       const product = await this.productRepo.findOneOrFail({
         where: { id },
-        relations: ['skus', 'category', 'comment', 'store'],
+        relations: ['skus', 'category', 'comment', 'store']
       });
 
-      if (!product)
+      if (!product || Object.entries(product).length == 0)
         throw new HttpException(
           `Product with ID ${id} not found`,
           HttpStatus.NOT_FOUND,
