@@ -9,9 +9,9 @@ import { QueryProductsDto } from '../dto/query-products.dto';
 import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 import { HttpException } from '@nestjs/common';
 
-jest.mock('@/utils/InternalServerError', ()=>({
-    logAndThrowInternalServerError: jest.fn()
-}))
+jest.mock('@/utils/InternalServerError', () => ({
+  logAndThrowInternalServerError: jest.fn(),
+}));
 
 describe('GetProductsHandler', () => {
   let handler: GetProductsHandler;
@@ -50,7 +50,7 @@ describe('GetProductsHandler', () => {
       getCount: jest.fn(),
       getMany: jest.fn(),
     };
-    (productRepository.createQueryBuilder as jest.Mock).mockReturnValue(qb);
+    jest.spyOn(productRepository, 'createQueryBuilder').mockReturnValue(qb);
     return qb;
   };
 
@@ -68,23 +68,27 @@ describe('GetProductsHandler', () => {
     const qb = mockQueryBuilder();
     qb.getCount.mockResolvedValue(1);
     qb.getMany.mockResolvedValue([mockProduct([])]);
-    const query= {
-        storeId: '1'
-    } as GetProductsQuery
+    const query = {
+      storeId: '1',
+    } as GetProductsQuery;
 
     await handler.execute(new GetProductsQuery(query.storeId));
-    expect(qb.andWhere).toHaveBeenCalledWith('store.id = :storeId', { storeId: query.storeId });
+    expect(qb.andWhere).toHaveBeenCalledWith('store.id = :storeId', {
+      storeId: query.storeId,
+    });
   });
 
   it('should filter by categoryId', async () => {
     const qb = mockQueryBuilder();
     qb.getCount.mockResolvedValue(1);
     qb.getMany.mockResolvedValue([mockProduct([])]);
-     const query= {
-        categoryId: '2'
-    } as GetProductsQuery
+    const query = {
+      categoryId: '2',
+    } as GetProductsQuery;
     await handler.execute(new GetProductsQuery(undefined, query.categoryId));
-    expect(qb.andWhere).toHaveBeenCalledWith('category.id = :categoryId', { categoryId: query.categoryId });
+    expect(qb.andWhere).toHaveBeenCalledWith('category.id = :categoryId', {
+      categoryId: query.categoryId,
+    });
   });
 
   it('should filter by name', async () => {
@@ -92,9 +96,21 @@ describe('GetProductsHandler', () => {
     qb.getCount.mockResolvedValue(1);
     qb.getMany.mockResolvedValue([mockProduct([])]);
 
-    const query = { name: 'Test'} as GetProductsQuery
-    await handler.execute(new GetProductsQuery(undefined, undefined, undefined, undefined, undefined, undefined, query.name));
-    expect(qb.andWhere).toHaveBeenCalledWith('product.name ILIKE :name', { name: `%${query.name}%` });
+    const query = { name: 'Test' } as GetProductsQuery;
+    await handler.execute(
+      new GetProductsQuery(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        query.name,
+      ),
+    );
+    expect(qb.andWhere).toHaveBeenCalledWith('product.name ILIKE :name', {
+      name: `%${query.name}%`,
+    });
   });
 
   it('should filter by price range', async () => {
@@ -102,12 +118,27 @@ describe('GetProductsHandler', () => {
     qb.getCount.mockResolvedValue(1);
     qb.getMany.mockResolvedValue([mockProduct([])]);
 
-    const query = { minRange: 10, maxRange: 50} as QueryProductsDto
-    await handler.execute(new GetProductsQuery(undefined, undefined, undefined, undefined, undefined,undefined, undefined, query.minRange, query.maxRange));
-    expect(qb.andWhere).toHaveBeenCalledWith('skus.price BETWEEN :minRange AND :maxRange', {
-      minRange: 10,
-      maxRange: 50,
-    });
+    const query = { minRange: 10, maxRange: 50 } as QueryProductsDto;
+    await handler.execute(
+      new GetProductsQuery(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        query.minRange,
+        query.maxRange,
+      ),
+    );
+    expect(qb.andWhere).toHaveBeenCalledWith(
+      'skus.price BETWEEN :minRange AND :maxRange',
+      {
+        minRange: 10,
+        maxRange: 50,
+      },
+    );
   });
 
   it('should sort in DESC order', async () => {
@@ -115,8 +146,20 @@ describe('GetProductsHandler', () => {
     qb.getCount.mockResolvedValue(1);
     qb.getMany.mockResolvedValue([mockProduct([])]);
 
-    const query = {sortBy: 'name', sortOrder: 'DESC'} as GetProductsQuery
-    await handler.execute(new GetProductsQuery(undefined, undefined, query.sortBy, query.sortOrder, undefined, undefined, undefined, undefined, undefined));
+    const query = { sortBy: 'name', sortOrder: 'DESC' } as GetProductsQuery;
+    await handler.execute(
+      new GetProductsQuery(
+        undefined,
+        undefined,
+        query.sortBy,
+        query.sortOrder,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+      ),
+    );
     expect(qb.orderBy).toHaveBeenCalledWith('product.name', 'DESC');
   });
 
@@ -127,8 +170,10 @@ describe('GetProductsHandler', () => {
     qb.getCount.mockResolvedValue(2);
     qb.getMany.mockResolvedValue([product2, product1]);
 
-    const query = { sortBy: ProductSortBy.RATING} as GetProductsQuery 
-    const result = await handler.execute(new GetProductsQuery(undefined, undefined, query.sortBy));
+    const query = { sortBy: ProductSortBy.RATING } as GetProductsQuery;
+    const result = await handler.execute(
+      new GetProductsQuery(undefined, undefined, query.sortBy),
+    );
     expect(result.data[0].rating).toBeGreaterThanOrEqual(result.data[1].rating);
   });
 
@@ -137,14 +182,15 @@ describe('GetProductsHandler', () => {
     qb.getCount.mockResolvedValue(0);
     qb.getMany.mockResolvedValue([]);
 
-    await handler.execute(new GetProductsQuery())
+    await handler.execute(new GetProductsQuery());
 
-    expect(logAndThrowInternalServerError).toHaveBeenCalledWith( 
-        expect.any(HttpException),
-        'GetProductsHandler',
-        'Product/Retrieval',
-        activityLogService,
-        expect.any(Object))
+    expect(logAndThrowInternalServerError).toHaveBeenCalledWith(
+      expect.any(HttpException),
+      'GetProductsHandler',
+      'Product/Retrieval',
+      activityLogService,
+      expect.any(Object),
+    );
   });
 
   it('should return products with correct mapping', async () => {
@@ -170,9 +216,18 @@ describe('GetProductsHandler', () => {
     const qb = mockQueryBuilder();
     qb.getCount.mockRejectedValue(new Error('DB error'));
 
-    const spy = jest.spyOn(require('@/utils/InternalServerError'), 'logAndThrowInternalServerError').mockImplementation(() => { throw new Error('logged'); });
+    const spy = jest
+      .spyOn(
+        require('@/utils/InternalServerError'),
+        'logAndThrowInternalServerError',
+      )
+      .mockImplementation(() => {
+        throw new Error('logged');
+      });
 
-    await expect(handler.execute(new GetProductsQuery())).rejects.toThrow('logged');
+    await expect(handler.execute(new GetProductsQuery())).rejects.toThrow(
+      'logged',
+    );
     expect(spy).toHaveBeenCalled();
   });
 

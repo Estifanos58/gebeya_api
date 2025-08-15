@@ -1,7 +1,6 @@
 import { CommandHandler, IQueryHandler } from '@nestjs/cqrs';
 import { GetOrdersQuery } from '../query/get_orders.query';
 import {
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

@@ -4,7 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cart, CartItem } from '@/entities';
 import { Repository } from 'typeorm';
 import {
-  InternalServerErrorException,
+  HttpException,
+  HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
 import { OrderItem } from '@/entities/order_item';
@@ -33,9 +34,9 @@ export class CreateOrderHandler implements ICommandHandler<CreateOrderCommand> {
     const orderContactInfo = contactInfo ?? user?.phoneNumber;
 
     if (!orderDeliveryAddress || !orderContactInfo) {
-      throw new InternalServerErrorException(
-        'Delivery address and contact info are required',
-      );
+      throw new HttpException({
+        message: 'Delivery address and contact info are required',
+    }, HttpStatus.BAD_REQUEST);
     }
 
     try {

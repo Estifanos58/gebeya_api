@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Query, Req, Res } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { Request, Response } from 'express';
+import { Request} from 'express';
 import { CreateOrderCommand } from './command/create_order.command';
 import { CreateOrderDto } from './dto/create_order.dto';
 import { GetOrdersQuery } from './query/get_orders.query';
@@ -20,9 +20,8 @@ export class OrderController {
   async createOrder(
     @Body() body: CreateOrderDto,
     @Req() req: Request,
-    @Res() res: Response,
   ) {
-    const order = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new CreateOrderCommand(
         req.user!,
         body.cartId,
@@ -30,7 +29,6 @@ export class OrderController {
         body.contactInfo,
       ),
     );
-    return res.status(200).json({ ...order });
   }
 
 
@@ -42,11 +40,10 @@ export class OrderController {
   async getOrders(
     @Query('status') status: OrderStatus | undefined,
     @Req() req: Request,
-    @Res() res: Response,
   ) {
     const userId = req.userId!;
-    const orders = await this.commandBus.execute(new GetOrdersQuery(userId, status));
-    return res.status(200).json(orders);
+    return await this.commandBus.execute(new GetOrdersQuery(userId, status));
+
   }
 
   @Get('/:storeId')
@@ -57,14 +54,9 @@ export class OrderController {
   async getStoreOrder(
     @Param('storeId') storeId: Store['id'],
     @Query('status') status: OrderStatus | undefined,
-    @Req() req: Request,
-    @Res() res: Response,
+    @Req() req: Request
   ){
     const userId = req.userId!;
-    const orders = await this.commandBus.execute(new GetStoreOrdersQuery(userId, storeId, status));
-    return {
-      message: 'Orders retrieved successfully',
-      data: orders,
-    };
+    return await this.commandBus.execute(new GetStoreOrdersQuery(userId, storeId, status));
   }
 }
