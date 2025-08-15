@@ -42,7 +42,7 @@ export class ChapaInitializePaymentHandler
       relations: ['user'],
     });
 
-    if (!store) {
+    if (!store || Object.entries(store).length === 0) {
       throw new HttpException('Store not found', HttpStatus.BAD_REQUEST);
     }
 
@@ -51,7 +51,7 @@ export class ChapaInitializePaymentHandler
       relations: ['items', 'items.productSkus'],
     });
 
-    if (!order) {
+    if (!order || Object.entries(order).length == 0) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
 
@@ -59,7 +59,7 @@ export class ChapaInitializePaymentHandler
       where: { order: {id: order.id}},
     });
 
-    if (paymentExists) {
+    if (paymentExists && Object.entries(paymentExists).length !== 0) {
       throw new HttpException(
         'Payment already exists for this order',
         HttpStatus.BAD_REQUEST,
