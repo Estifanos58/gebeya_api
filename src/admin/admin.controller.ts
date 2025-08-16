@@ -13,7 +13,7 @@ import {
 import { ApproveStoreDto } from './dto/approve_store.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApproveStoreCommand } from './command/approve_store.command';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { BannedStoreDto } from './dto/banned_store.dto';
 import { BanStoreCommand } from './command/ban_store.command';
 import { UnBanStoreCommand } from './command/upban_store.command';
@@ -23,6 +23,9 @@ import { GetUsersQuery } from './query/get_users.query';
 import { GetStoresQuery, StoreSortQuery } from './query/get_stores.query';
 import { GetActivitiesQuery } from './query/get_activities.query';
 import { GetActivityByIdQuery } from './query/get_activity_byId.query';
+import { ApiResponse } from '@nestjs/swagger';
+import { CreateCategoryCommand } from './command/createCategory.command';
+import { CreateCategoryDto } from './dto/createCategory.dto';
 
 @Controller('admin')
 @Roles([UserRole.ADMIN])
@@ -99,6 +102,22 @@ export class AdminController {
   ): Promise<any> {
     return this.queryBus.execute(
       new GetStoresQuery(search, verified, sortBy, order, banned, page, limit),
+    );
+  }
+  @Post('category')
+  @ApiResponse({
+    status: 201,
+    description: 'Category created successfully',
+  })
+  async createCategory(
+    @Body() createCategoryDto: CreateCategoryDto,
+    
+  ) {
+    return await this.commandBus.execute(
+      new CreateCategoryCommand(
+        createCategoryDto.name,
+        createCategoryDto.description,
+      ),
     );
   }
 

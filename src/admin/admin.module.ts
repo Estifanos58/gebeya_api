@@ -14,6 +14,7 @@ import { UserUnbanHandler } from './handler/unban_user.handler';
 import { GetUsersHandler } from './handler/get_users.handler';
 import { GetStoresHandler } from './handler/get_stores.handler';
 import { GetActivitiesHandler } from './handler/get_activities.handler';
+import { CreateCategoryHandler } from './handler/create-category.handler';
 
 const CommandHandlers = [
   ApproveStoreHandler,
@@ -21,6 +22,7 @@ const CommandHandlers = [
   UnBanStoreHandler,
   UserBanHandler,
   UserUnbanHandler,
+  CreateCategoryHandler
 ];
 
 const QueryHandlers = [GetUsersHandler, GetStoresHandler, GetActivitiesHandler];

@@ -5,20 +5,19 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
 import { CreateStoreDto } from './dto/createStore.dto';
 import { Roles } from '@/decorator/roles.decorator';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateStoreCommand } from './command/createStore.command';
 import { DeleteStoreCommand } from './command/deleteStore.command';
 import { UserRole } from '@/entities';
-import { GetAllStoreQuery } from './query/get-all-stores.query';
+import { GetAllStoreQuery, StoreOrder } from './query/get-all-stores.query';
 import { GetStoreQuery } from './query/get-store.query';
-import { CreateCategoryDto } from './dto/createCategory.dto';
-import { CreateCategoryCommand } from './command/createCategory.command';
 import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('store')
@@ -37,10 +36,9 @@ export class StoreController {
   async createStore(
     @Body() body: CreateStoreDto,
     @Req() req: Request,
-    @Res() res: Response,
   ): Promise<any> {
     // Logic to create a store
-    const store = await this.commandBus.execute(
+    return await this.commandBus.execute(
       new CreateStoreCommand(
         req.userId!,
         body.storeName,
@@ -48,7 +46,6 @@ export class StoreController {
         body.phoneNumber,
       ),
     );
-    return res.status(201).json({ ...store });
   }
 
   @Get()
@@ -56,9 +53,14 @@ export class StoreController {
     status: 200,
     description: 'Returns all stores',
   })
-  async findAll(@Req() req: Request, @Res() res: Response) {
-    const store = await this.queryBus.execute(new GetAllStoreQuery());
-    return res.status(200).json({ ...store });
+  async findAll(
+    @Query('name') name?: string,
+    @Query('orderBy') orderBy?: StoreOrder,
+    @Query('sortBy') sortBy: 'ASC' | 'DESC' = 'ASC',
+    @Query('isVerified') isVerified: boolean | null = null,
+    @Query('banned') banned: boolean | null = null,
+  ) {
+    return await this.queryBus.execute(new GetAllStoreQuery(name, orderBy, sortBy, isVerified, banned));
   }
 
   @Get(':id')
@@ -66,14 +68,9 @@ export class StoreController {
     status: 200,
     description: 'Returns a specific store by ID',
   })
-  async findOne(
-    @Param('id') id: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
+  async findOne(@Param('id') id: string) {
     // console.log("id: ", id)
-    const store = await this.queryBus.execute(new GetStoreQuery(id));
-    return res.status(200).json({ ...store });
+    return await this.queryBus.execute(new GetStoreQuery(id));
   }
 
   @Delete(':id')
@@ -81,35 +78,7 @@ export class StoreController {
     status: 200,
     description: 'Store deleted successfully',
   })
-  async deleteStore(
-    @Param('id') id: string,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    const store = await this.commandBus.execute(
-      new DeleteStoreCommand(id, req.user),
-    );
-
-    return res.status(200).json({ ...store });
-  }
-
-  @Roles([UserRole.MERCHANT])
-  @Post('category')
-  @ApiResponse({
-    status: 201,
-    description: 'Category created successfully',
-  })
-  async createCategory(
-    @Body() createCategoryDto: CreateCategoryDto,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    const category = await this.commandBus.execute(
-      new CreateCategoryCommand(
-        createCategoryDto.name,
-        createCategoryDto.description,
-      ),
-    );
-    return res.status(201).json(category);
+  async deleteStore(@Param('id') id: string, @Req() req: Request) {
+    return await this.commandBus.execute(new DeleteStoreCommand(id, req.user));
   }
 }
