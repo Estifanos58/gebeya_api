@@ -4,13 +4,12 @@ import { EntityModule } from "@/entities/entity.module";
 import { CqrsModule } from "@nestjs/cqrs";
 import { MailModule } from "@/mail/mail.module";
 import { CreateStoreHandler } from "./handlers/createStore.handler";
-import { CreateCategoryHandler } from "./handlers/create-category.handler";
 import { GetAllStoreHandler } from "./handlers/get-all-stores.handler";
-import { GetStoreHandler } from "./handlers/get-store.hanlder";
+import { GetStoreHandler } from "./handlers/get-store.handler";
 import { DeleteStoreHandler } from "./handlers/deleteStore.handler";
 import { ActivityLogModule } from "@/log/activityLog.module";
 
-const CommandHandler = [CreateStoreHandler, CreateCategoryHandler, DeleteStoreHandler];
+const CommandHandler = [CreateStoreHandler, DeleteStoreHandler];
 const QueryHandler = [GetAllStoreHandler, GetStoreHandler];
 
 @Module({

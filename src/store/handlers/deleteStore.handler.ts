@@ -31,6 +31,16 @@ export class DeleteStoreHandler implements ICommandHandler<DeleteStoreCommand> {
       }
       await this.storeRepo.delete({ id });
 
+      this.activityLogService.info(
+        'Store Deleted',
+        'Store/DeleteStoreHandler',
+        user.id,
+        user.role,
+        {
+          email : user.email
+        }
+      )
+
       return {
         message: 'Store deleted successfully',
       };

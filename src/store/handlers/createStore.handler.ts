@@ -55,6 +55,16 @@ export class CreateStoreHandler implements ICommandHandler<CreateStoreCommand> {
         user,
       });
 
+      this.activityLogService.info(
+        'New Store Created',
+        'Store/CreateStoreHandler',
+        user.id,
+        user.role,
+        {
+          email: user.email
+        }
+      )
+
       const savedStore = await this.storeRepo.save(store);
 
       return {

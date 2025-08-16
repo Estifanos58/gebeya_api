@@ -16,8 +16,24 @@ export class GetAllStoreHandler implements IQueryHandler<GetAllStoreQuery>{
         private readonly activityLogService: ActivityLogService
     ){}
     async execute(query: GetAllStoreQuery): Promise<any> {
+        const { name, orderBy, sortBy, isVerified, banned } = query;
+
         try {
-            const store = await this.storeRepo.find();
+            const queryBuilder = this.storeRepo.createQueryBuilder('store')
+                .leftJoinAndSelect('store.user', 'user')
+                .leftJoinAndSelect('store.product', 'product')
+                .leftJoinAndSelect('store.comment', 'comment')
+                .leftJoinAndSelect('store.payments', 'payments')
+
+            if(name) queryBuilder.where('store.name ILIKE :name', { name: `%${name}%` });
+            if(isVerified !== null) queryBuilder.andWhere('store.isVerified = :isVerified', { isVerified });
+            if(banned !== null) queryBuilder.andWhere('store.banned = :banned', { banned });
+            if(orderBy) {
+                queryBuilder.orderBy(`store.${orderBy}`, sortBy);
+            } else {
+                queryBuilder.orderBy('store.createdAt', sortBy);
+            }
+            const store = await queryBuilder.getMany();
 
             if(!store) throw new HttpException({ message: "Stores Not Found"}, HttpStatus.NOT_FOUND)
 
