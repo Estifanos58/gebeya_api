@@ -8,6 +8,7 @@ import { ActivityLogService } from '@/log/activityLog.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ChapaVerifyCommand } from '../command/chapa_verify_command';
+import { logAndThrowInternalServerError } from '@/utils/InternalServerError';
 
 jest.mock('@/utils/InternalServerError', () => ({
   logAndThrowInternalServerError: jest.fn(),
@@ -128,5 +129,48 @@ describe('ChapaVerifyHandler', () => {
         where: { payment: {id: mockPayment.id}}
     })
     expect(eventEmitter.emit).toHaveBeenCalled()
+  })
+
+
+  it('should throw NotFoundException if payment not found', async () => {
+    const command = { tx_ref: 'tx_ref_1234' } as ChapaVerifyCommand;
+    jest.spyOn(paymentRepository, 'findOne').mockResolvedValue(null);
+
+    await handler.execute(command)
+
+    expect(paymentRepository.findOne).toHaveBeenCalledWith({
+      where: { reference: command.tx_ref },
+      relations: ['user']
+    });
+    expect(logAndThrowInternalServerError).toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
+  });
+
+  it('should throw HttpException if payment verification fails', async () => {
+    const command = { tx_ref: 'tx_ref_1234' } as ChapaVerifyCommand;
+    const mockPayment = {
+      id: 'paymentId_1',
+      user: {
+        id: 'userId_1',
+      } as User,
+      status: PaymentStatus.PENDING,
+    } as Payment;
+    jest.spyOn(paymentRepository, 'findOne').mockResolvedValue(mockPayment);
+    jest.spyOn(httpService.axiosRef, 'get').mockResolvedValue({
+      status: 400,
+      data: { status: 'failed' },
+    });
+
+    await handler.execute(command)
+
+    expect(paymentRepository.findOne).toHaveBeenCalledWith({
+      where: { reference: command.tx_ref },
+      relations: ['user']
+    })
+    expect(httpService.axiosRef.get).toHaveBeenCalled();
+    expect(eventEmitter.emit).not.toHaveBeenCalled();
+    expect(logAndThrowInternalServerError).toHaveBeenCalled()
+  
+
   })
 });
