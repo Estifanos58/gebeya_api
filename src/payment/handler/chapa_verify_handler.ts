@@ -36,7 +36,7 @@ export class ChapaVerifyHandler implements ICommandHandler<ChapaVerifyCommand> {
     try {
       const payment = await this.paymentRepository.findOne({
         where: { reference: tx_ref },
-        relations: ['user'],
+        relations: ['user']
       });
       if (!payment) {
         throw new NotFoundException('Payment with this reference not found');
