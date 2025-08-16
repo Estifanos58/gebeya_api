@@ -10,9 +10,6 @@ import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 @CommandHandler(updateCartCommand)
 export class UpdateCartHandler implements ICommandHandler<updateCartCommand> {
   constructor(
-    @InjectRepository(Cart)
-    private readonly cartRepository: Repository<Cart>,
-
     @InjectRepository(CartItem)
     private readonly cartItemRepository: Repository<CartItem>,
 

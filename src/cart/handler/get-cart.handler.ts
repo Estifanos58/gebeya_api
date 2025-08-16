@@ -3,7 +3,7 @@ import { GetCartQuery } from "../query/get-cart.query";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Cart } from "@/entities";
 import { Repository } from "typeorm";
-import { HttpException, HttpStatus, NotFoundException } from "@nestjs/common";
+import {  NotFoundException } from "@nestjs/common";
 import { ActivityLogService } from "@/log/activityLog.service";
 import { logAndThrowInternalServerError } from "@/utils/InternalServerError";
 
