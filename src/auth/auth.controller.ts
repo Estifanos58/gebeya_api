@@ -22,14 +22,14 @@ import { ResetPasswordCommand } from './commands/reset-password.command';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { GetUserQuery } from './queries/get-user-query';
 import { RefreshTokenCommand } from './commands/refresh-token.command';
-import { UserRole } from '@/entities';
+import { User, UserRole } from '@/entities';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 // Extend the Request interface to include 'user'
 declare module 'express' {
   export interface Request {
     user?: any;
-    userId?: string; // Optional: if you want to attach userId as well
+    userId?: any; // Optional: if you want to attach userId as well
     userRole?: UserRole; // Optional: if you want to attach userRole
   }
 }
