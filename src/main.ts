@@ -10,7 +10,7 @@ async function bootstrap() {
     .setTitle('GEBEYA Multi Vender API')
     .setDescription('Your API description')
     .setVersion('1.0')
-    .addServer('http://localhost:3000/', 'Local environment')
+    .addServer(`${process.env.PUBLIC_URL}`, 'Production environment')
     .addTag('Your API Tag')
     .build();
 
@@ -19,6 +19,6 @@ const document = SwaggerModule.createDocument(app, options);
   app.useGlobalPipes(new ValidationPipe());
   app.useLogger(new Logger());
   app.use(cookieParser()); // Use cookie parser middleware to parse cookies
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 bootstrap();
