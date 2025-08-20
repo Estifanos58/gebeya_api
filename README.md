@@ -1,79 +1,95 @@
-## GEBEYA API
+# GEBEYA API
 
-# Authentication
- - [x] Registration, Login (JWT)
- - [x] Roles: (admin, merchant, customer, delivery)
- - [x] Email verification via OTP
- - [x] Password reset via email + expiration
- - [x] Refresh token + Access token management
- - [x] Rate-limiting on Login, OTP, reset
- - [] Session activity tracking (devices, IP)
- - [] User ban. disable by admin
+A **comprehensive backend API** for a **multi-vendor e-commerce platform**, built with **NestJS**, **PostgreSQL**, and **TypeORM**.  
+It follows the **CQRS pattern** with **event-driven architecture** and provides robust features for **admins, vendors, and users**.  
 
-# store 
-  - [x] create a store
-  - [x] Store rating and Reviews
-  - [] Inventory managenment(stoke, low stoke warning) ***
-  - [x] Add Product to Store
-  - [x] Update Product In Store
-  - [x] Remove product from Store 
-  - [x] get store Data
-  - [x] get product detail 
-  - [] Notify Store Owner When certain Product quantity reachs Low Point ***
-  - [x] Notify Store Owner When A Product is Purchased
+---
 
-# Cart System
-  - [x] Add/ update / remove items from Cart
-  - [x] Sync Cart When User Logs In
-  - [] Cart expires after X days  ***
-  - [x] Save for Later
+## ✨ Features
 
-# Order System
-  - [x] Order status (pending, shipped, delivered, cancelled)
-  - [x] Automatic order number generator
-  - [x] Delivery address + contact info on Order
-  - [] Merchant see All Orders
+- **Authentication & Authorization** (Admin, Vendor, Customer roles)  
+- **Multi-vendor store support** with admin validation  
+- **Product management** (CRUD, approval workflow, categories)  
+- **Advanced filtering & pagination** for products and stores  
+- **Chapa payment integration** (initialize & verify transactions)  
+- **Persistent cart** (7-day expiration with cron job cleanup)  
+- **Order management** with payment validation  
+- **Comments & Reviews** (products and stores, editable)  
+- **Email service** for signup, store creation, order confirmation, and payment verification  
+- **CQRS + Event-driven architecture** for scalability
+- **Full Test Coverage** (Unit Test) 
 
-# Product Reviews and Ratings
-  - [x] Review system(1-5 stars + comments)
-  - [x] Full-text search by name,  category
-  - [x] Price range filtering
-  - [x] Sort by price, populating, rating
-  - [] Related/ recommended products
-  - [] Search analytitcs/ logging
+---
 
-# Admin Dashboard
-  - [] View metrics (total sales, users, acive merchants)
-  - [] Approve/ reject products/ stores
-  - [] View best selling products
-  - [] Block users/stores/products
-  - [] View transactions and payment Status
-  - [] Export CSV report
+## 🛠 Tech Stack
 
-# Payment System 💳 (NEW)
-  - [x] Integrate with payment gateway (e.g., Stripe, Chapa, Flutterwave)
-  - [x] Generate payment session URL (redirect / inline)
-  - [x] Payment webhook listener (success, failure, timeout)
-  - [x] Mark order as paid on successful payment
-  - [x] Save transaction metadata (payment ID, gateway, status)
-  - [] User payment history endpoint
-  - [] Merchant payout tracking
-  - [] Admin view all transactions
-  - [] Support refund logic
-  - [] Support internal wallet/credit balance (optional)
-  - [] OTP-confirmed high-value transactions (optional)
+- **Framework**: NestJS  
+- **Database**: PostgreSQL + TypeORM  
+- **Payment Gateway**: Chapa  
+- **Email Service**: Gmail SMTP  
+- **Architecture**: CQRS + Event-driven  
+- **Other**: Cron jobs for cart cleanup
+- **Test**: Jest
 
-⚙️ Future: Automation, Cron, Events, Queues
-  - [] Cron job to clean expired carts
-  - [x] Event-based notification system
-  - [] Background queue to process emails
-  - [] Low-stock product alert via queue
-  - [] Retry failed payments automatically
-  - [] Reward system using scheduled tasks
-<!-- # Customer
-  [] register
-  [] search store
-  [] search product
-  [] send email when purchase made
-  [] make a purchase 
-  [] add  -->
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file in the project root with the following values:
+
+```env
+# Application
+PORT=3000
+PUBLIC_URL=http://localhost:3000
+BASE_URL=http://localhost:3000
+FRONTEND_URL=""
+
+# Database
+DATABASE_URL="postgres://username:password@localhost:5432/gebeya"
+
+# JWT
+JWT_SECRET="your-secret-key"
+
+# Gmail SMTP (for email notifications)
+GMAIL_HOST=smtp.gmail.com
+GMAIL_PORT=587
+GMAIL_USER="your-email@gmail.com"
+GMAIL_PASSWORD="your-app-password"
+
+# Chapa Payment Integration
+CHAPA_INITIALIZER="https://api.chapa.co/v1/transaction/initialize"
+CHAPA_VERIFY_URL="https://api.chapa.co/v1/transaction/verify"
+CHAPA_PUBLIC_KEY="your-public-key"
+CHAPA_SECRET_KEY="your-secret-key"
+```
+---
+
+## Installation
+
+Clone the repository:
+```bash
+git clone https://github.com/Estifanos58/gebeya-api.git
+cd gebeya-api
+```
+
+Install dependencies:
+```bash
+npm install
+```
+
+Run database migrations:
+```bash
+npm run typeorm migration:run
+```
+
+Start the development server:
+```bash
+npm run start:dev
+```
+
+For Testing
+```bash
+npm run test
+```
+
+
