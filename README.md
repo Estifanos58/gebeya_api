@@ -3,6 +3,10 @@
 A **comprehensive backend API** for a **multi-vendor e-commerce platform**, built with **NestJS**, **PostgreSQL**, and **TypeORM**.  
 It follows the **CQRS pattern** with **event-driven architecture** and provides robust features for **admins, vendors, and users**.  
 
+<div>
+  <img width="701" height="327" alt="image" src="https://github.com/user-attachments/assets/8c00fdeb-0ef3-4eff-a59b-eb903ed3419b" />
+
+</div>
 ---
 
 ## ✨ Features
